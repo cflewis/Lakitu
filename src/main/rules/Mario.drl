@@ -1,0 +1,16 @@
+#created on: Aug 31, 2009
+package edu.ucsc.eis.mario
+
+#list any import classes here.
+import edu.ucsc.eis.mario.sprites.Mario
+
+
+#declare any global variables here
+
+rule "Output if Mario is ducking"
+	when
+		$mario : Mario()
+		eval($mario.isDucking())
+	then 
+		System.err.println("Mario is ducking!");
+end
