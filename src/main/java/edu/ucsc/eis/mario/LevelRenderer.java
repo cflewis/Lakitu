@@ -83,7 +83,9 @@ public class LevelRenderer
                 int b = level.getBlock(x, y) & 0xff;
                 if (((Level.TILE_BEHAVIORS[b]) & Level.BIT_ANIMATED) == 0)
                 {
-                    g.drawImage(Art.level[b % 16][b / 16], (x << 4) - xCam, (y << 4) - yCam, null);
+                	if (Art.level != null) {
+                		g.drawImage(Art.level[b % 16][b / 16], (x << 4) - xCam, (y << 4) - yCam, null);
+                	}
                 }
             }
         }

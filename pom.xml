@@ -50,5 +50,15 @@
   		<artifactId>drools-jsr94</artifactId>
   		<version>5.0.1</version>
   	</dependency>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.7</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.mockito</groupId>
+  		<artifactId>mockito-all</artifactId>
+  		<version>1.8.0</version>
+  	</dependency>
   </dependencies>
 </project>

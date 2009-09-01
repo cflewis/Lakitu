@@ -34,7 +34,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 	private boolean focused = false;
     private boolean useScale2x = false;
     private MapScene mapScene;
-    int delay;
+    int delay = 0;
     private StatelessKnowledgeSession ksession;
 
     private Scale2x scale2x = new Scale2x(320, 240);
@@ -123,7 +123,6 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     {
         graphicsConfiguration = getGraphicsConfiguration();
 
-        //      scene = new LevelScene(graphicsConfiguration);
         mapScene = new MapScene(graphicsConfiguration, this, new Random().nextLong());
         scene = mapScene;
         scene.setSound(sound);
