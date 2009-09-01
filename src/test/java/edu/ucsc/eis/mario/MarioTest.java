@@ -92,6 +92,24 @@ public class MarioTest {
 		assertTrue(mario.getJumpTime() <= 0);
 	}
 	
+	@Test
+	public void testDuck() {
+		Mario.large = false;
+		assertFalse(Mario.large);
+		tickScene(1);
+		
+		mario.keys[Mario.KEY_DOWN] = true;
+		tickScene(1);
+		
+		assertFalse(mario.isDucking());
+		tickScene(1);
+		
+		Mario.large = true;
+		assertTrue(Mario.large);
+		tickScene(1);
+		assertTrue(mario.isDucking());
+	}
+	
 	private void tickScene(int ticks) {
 		for (int i = 0; i < ticks; i++) {
 			ksession.execute(((LevelScene) scene).mario);
