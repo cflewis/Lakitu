@@ -5,6 +5,9 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import org.drools.KnowledgeBase;
 import org.drools.runtime.StatelessKnowledgeSession;
@@ -27,6 +30,8 @@ public class MarioTest {
 	LevelScene scene;
 	Mario mario;
 	StatelessKnowledgeSession ksession;
+	OutputStream os;
+	OutputStream eos;
 	
 	@Before
 	public void setUp() {
@@ -61,6 +66,14 @@ public class MarioTest {
 			t.printStackTrace();
 			System.exit(1);
 		}
+
+		os = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(os);
+		System.setOut(ps);
+		
+		eos = new ByteArrayOutputStream();
+		PrintStream eps = new PrintStream(eos);
+		System.setErr(eps);
 		
 		tickScene(2000);
 	}
@@ -108,11 +121,13 @@ public class MarioTest {
 		assertTrue(Mario.large);
 		tickScene(1);
 		assertTrue(mario.isDucking());
+		tickScene(1);
+		assertTrue(eos.toString().contains("Mario is ducking!"));
 	}
 	
 	private void tickScene(int ticks) {
 		for (int i = 0; i < ticks; i++) {
-			ksession.execute(((LevelScene) scene).mario);
+			ksession.execute(mario);
 			scene.tick();
 		}
 	}
