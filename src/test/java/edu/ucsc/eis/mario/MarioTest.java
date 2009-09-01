@@ -6,6 +6,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 
+import org.drools.KnowledgeBase;
+import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.*;
 public class MarioTest {
 	LevelScene scene;
 	Mario mario;
+	StatelessKnowledgeSession ksession;
 	
 	@Before
 	public void setUp() {
@@ -48,6 +51,16 @@ public class MarioTest {
 		scene.init();
 		
 		mario = scene.mario;
+		
+		try {
+			// load up the knowledge base
+			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");
+			ksession = kbase.newStatelessKnowledgeSession();
+			//knowledgeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "test");
+		} catch (Throwable t) {
+			t.printStackTrace();
+			System.exit(1);
+		}
 		
 		tickScene(2000);
 	}
@@ -81,6 +94,7 @@ public class MarioTest {
 	
 	private void tickScene(int ticks) {
 		for (int i = 0; i < ticks; i++) {
+			ksession.execute(((LevelScene) scene).mario);
 			scene.tick();
 		}
 	}
