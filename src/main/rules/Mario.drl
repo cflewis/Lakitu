@@ -14,3 +14,10 @@ rule "Output if Mario is ducking"
 	then 
 		System.err.println("Mario is ducking!");
 end
+
+rule "Stop Mario interaction if he is dead"
+    when
+        $mario : Mario(deathTime > 0)
+    then
+        System.err.println("Mario is dead");
+end

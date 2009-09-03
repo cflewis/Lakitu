@@ -26,6 +26,17 @@ import edu.ucsc.eis.mario.level.LevelGenerator;
 import edu.ucsc.eis.mario.sprites.Mario;
 import static org.mockito.Mockito.*;
 
+/**
+ * These unit tests should fail when the rule engine is disabled.
+ * When it is turned on, they should pass.
+ * Probably need some qualitative evaluation (80K students? Web deployment?).
+ * 
+ * The Required Action not possible bug is the sort of thing we need
+ * Drools Solver for... if there is no solution (eg. can't get over a jump),
+ * then we fail.
+ * @author cflewis
+ *
+ */
 public class MarioTest {
 	LevelScene scene;
 	Mario mario;
@@ -54,9 +65,12 @@ public class MarioTest {
 		scene.sound = sound;
 		doNothing().when(sound).play(any(SonarSample.class), any(SoundSource.class), anyFloat(), anyFloat(), anyFloat());
 		scene.init();
+		scene.paused = false;		
 		
 		mario = scene.mario;
-		
+		Mario.resetStatic();
+		mario.deathTime = 0;
+				
 		try {
 			// load up the knowledge base
 			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");
@@ -66,21 +80,31 @@ public class MarioTest {
 			t.printStackTrace();
 			System.exit(1);
 		}
-
-		os = new ByteArrayOutputStream();
-		PrintStream ps = new PrintStream(os);
-		System.setOut(ps);
-		
+				
 		eos = new ByteArrayOutputStream();
 		PrintStream eps = new PrintStream(eos);
 		System.setErr(eps);
 		
-		tickScene(2000);
+		tickScene(500);
 	}
 	
 	@Test
 	public void testSetup() {
 		assertTrue(true);
+	}
+	
+	@Test 
+	public void testMushroom() {
+		Mario.large = false;
+		Mario.fire = false;
+		assertFalse(Mario.large);
+		assertFalse(Mario.fire);
+				
+		mario.getMushroom();
+		tickScene(1000);
+		
+		assertTrue(Mario.large);
+		assertFalse(Mario.fire);
 	}
 	
 	@Test
@@ -93,6 +117,7 @@ public class MarioTest {
 		mario.getFlower();
 		tickScene(1000);
 		
+		assertTrue(Mario.large);
 		assertTrue(Mario.fire);
 	}
 	
@@ -122,7 +147,37 @@ public class MarioTest {
 		tickScene(1);
 		assertTrue(mario.isDucking());
 		tickScene(1);
-		assertTrue(eos.toString().contains("Mario is ducking!"));
+		assertTrue(eos.toString().contains("Mario is ducking"));
+	}
+	
+	/**
+	 * This satisfies the "Animation in wrong context" bug
+	 */
+	@Test
+	public void testAnimationSheet() {
+		assertTrue(mario.sheet == Art.smallMario);
+		testMushroom();
+		assertTrue(mario.sheet == Art.mario);
+		testFlower();
+		assertTrue(mario.sheet == Art.fireMario);
+	}
+	
+	/**
+	 * This satisfies the "Action when not allowed" bug.
+	 * As this kills Mario, this should either be tested at the end,
+	 * or I have to work out why the Mario instance variable
+	 * isn't being set to the new Mario that is created once this one
+	 * dies.
+	 */
+	@Test
+	public void testDeathInteraction() {
+		float oldX = mario.getX();
+		mario.die();
+		tickScene(1);
+		mario.keys[Mario.KEY_RIGHT] = true;
+		tickScene(1);
+		assertTrue(oldX == mario.x);
+		assertTrue(eos.toString().contains("Mario is dead"));
 	}
 	
 	private void tickScene(int ticks) {
