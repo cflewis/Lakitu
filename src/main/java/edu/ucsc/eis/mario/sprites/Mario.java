@@ -730,6 +730,18 @@ public class Mario extends Sprite
 		return jumpTime;
 	}
 
+	public void setJumpTime(int jumpTime) {
+		this.jumpTime = jumpTime;
+	}
+
+	public float getYJumpSpeed() {
+		return yJumpSpeed;
+	}
+
+	public void setYJumpSpeed(float yJumpSpeed) {
+		this.yJumpSpeed = yJumpSpeed;
+	}
+
 	public LevelScene getWorld() {
 		return world;
 	}

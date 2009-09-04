@@ -8,9 +8,17 @@ import java.awt.image.ImageObserver;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.TimeUnit;
 
+import org.drools.runtime.conf.ClockTypeOption;
+import org.drools.runtime.rule.FactHandle;
 import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.runtime.KnowledgeSessionConfiguration;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.time.SessionPseudoClock;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,8 +30,12 @@ import com.mojang.sonar.sample.SonarSample;
 import static org.junit.Assert.*;
 
 
+import edu.ucsc.eis.mario.events.Jump;
+import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.level.LevelGenerator;
+import edu.ucsc.eis.mario.sprites.Enemy;
 import edu.ucsc.eis.mario.sprites.Mario;
+import edu.ucsc.eis.mario.sprites.Shell;
 import static org.mockito.Mockito.*;
 
 /**
@@ -40,7 +52,7 @@ import static org.mockito.Mockito.*;
 public class MarioTest {
 	LevelScene scene;
 	Mario mario;
-	StatelessKnowledgeSession ksession;
+	StatefulKnowledgeSession ksession;
 	OutputStream os;
 	OutputStream eos;
 	
@@ -65,6 +77,7 @@ public class MarioTest {
 		scene.sound = sound;
 		doNothing().when(sound).play(any(SonarSample.class), any(SoundSource.class), anyFloat(), anyFloat(), anyFloat());
 		scene.init();
+		Art.stopMusic();
 		scene.paused = false;		
 		
 		mario = scene.mario;
@@ -74,7 +87,9 @@ public class MarioTest {
 		try {
 			// load up the knowledge base
 			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");
-			ksession = kbase.newStatelessKnowledgeSession();
+			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+			config.setOption(ClockTypeOption.get("pseudo"));
+			ksession = kbase.newStatefulKnowledgeSession(config, null);
 			//knowledgeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "test");
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -86,6 +101,13 @@ public class MarioTest {
 		System.setErr(eps);
 		
 		tickScene(500);
+	}
+	
+	@After
+	public void tearDown() {
+		// Reset the knowledge base
+		ksession.dispose();
+		System.out.print(eos);
 	}
 	
 	@Test
@@ -121,13 +143,75 @@ public class MarioTest {
 		assertTrue(Mario.fire);
 	}
 	
+	/**
+	 * This is an invalid position over time test.
+	 * Mario's normal jump lands after a second.
+	 * The longest jump time I've managed is less than two seconds.
+	 */
 	@Test
 	public void testJump() {
 		mario.keys[Mario.KEY_JUMP] = true;
-		tickScene(5);
+		tickScene(1);
 		assertTrue(mario.getJumpTime() > 0);
-		tickScene(100);
+		tickScene(3);
+		assertTrue(mario.getJumpTime() > 0);
+		tickScene(20);
 		assertTrue(mario.getJumpTime() <= 0);
+	}
+	
+	@Test
+	public void brokenJump() {
+		mario.setJumpTime(50);
+		assertTrue("Mario jump time was " + mario.getJumpTime(),
+				mario.getJumpTime() == 50);
+		tickScene(1);
+		// Rule engine should now kick in and stop the silly value
+		assertTrue(eos.toString().contains("Mario jumped too high"));
+		tickScene(1);
+		assertTrue(mario.getJumpTime() <= 0);
+		// Y is counted top to bottom, so higher Y is lower on screen
+		assertTrue(mario.getYJumpSpeed() >= 0);
+	}
+	
+	/**
+	 * This might need a change to the configuration of the knowledge
+	 * base, I'm not sure
+	 */
+	@Test
+	public void eventJump() {
+		FactHandle jumpEvent = ksession.insert(new Jump(mario));
+		ksession.insert(new Landing(mario));
+		
+		mario.setJumpTime(8);
+		testJump();
+		
+		FactHandle landingEvent = ksession.insert(new Landing(mario));
+		tickScene(1);
+		
+		assertTrue(eos.toString().contains("Found a jump event"));
+		assertFalse(eos.toString().contains("Mario jumped too long"));
+		// When Mario lands, we can retract this fact to show that he landed
+		ksession.retract(jumpEvent);
+		ksession.retract(landingEvent);
+	}
+	
+	@Test
+	public void brokenEventJump() throws InterruptedException {
+		FactHandle jumpEvent = ksession.insert(new Jump(mario));
+		
+		// Cause Mario to be able to jump for *ages*
+		for (int i = 0; i < 500; i++) {
+			mario.setJumpTime(7);
+			tickScene(1);
+		}
+		
+		FactHandle landingEvent = ksession.insert(new Landing(mario));
+		
+		tickScene(1);
+		
+		assertTrue(eos.toString().contains("Mario jumped too long"));
+		ksession.retract(jumpEvent);
+		ksession.retract(landingEvent);
 	}
 	
 	@Test
@@ -182,8 +266,12 @@ public class MarioTest {
 	
 	private void tickScene(int ticks) {
 		for (int i = 0; i < ticks; i++) {
-			ksession.execute(mario);
+			FactHandle marioFact = ksession.insert(mario);
+			ksession.fireAllRules();
 			scene.tick();
+			SessionPseudoClock clock = ksession.getSessionClock();
+			clock.advanceTime((1/24), TimeUnit.SECONDS);
+			ksession.retract(marioFact);
 		}
 	}
 }

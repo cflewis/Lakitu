@@ -3,9 +3,36 @@ package edu.ucsc.eis.mario
 
 #list any import classes here.
 import edu.ucsc.eis.mario.sprites.Mario
+import edu.ucsc.eis.mario.events.* 
 
 
 #declare any global variables here
+
+declare Jump
+    @role(event)
+    @expires(5s)
+end
+
+declare Landing
+    @role(event)
+    @expires(1s)
+end
+
+
+rule "Find jump event"
+    when
+        $jump : Jump()
+    then
+        System.err.println("Found a jump event: " + $jump);
+end
+
+rule "Find landing event"
+    when
+        $landing : Landing()
+    then
+        System.err.println("Found a landing event: " + $landing);
+end
+
 
 rule "Output if Mario is ducking"
 	when
@@ -21,3 +48,31 @@ rule "Stop Mario interaction if he is dead"
     then
         System.err.println("Mario is dead");
 end
+
+/**
+* This is a hard and fast parameter bug, but won't catch
+* bugs that are caused by some other issue. For that, we'll
+* need complex event processing
+*/
+
+rule "Prevent Mario jumping HIGHER than expected"
+    when
+        $mario : Mario(jumpTime > 8)
+    then
+        System.err.println("Mario jumped too high");
+        $mario.setJumpTime(-1);
+        $mario.setYJumpSpeed(0);
+end
+
+rule "Prevent Mario jumping LONGER than expected"
+    when
+        //The window of time Mario jumped is too long
+        $mario : Mario()
+        $jump : Jump()
+        not(Landing(this after[0s,3s] $jump))
+    then
+        System.err.println("Mario jumped too long");
+        $mario.setJumpTime(-1);
+        $mario.setYJumpSpeed(0);
+end
+        
