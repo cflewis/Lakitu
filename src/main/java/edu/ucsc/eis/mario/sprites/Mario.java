@@ -5,7 +5,10 @@ import com.mojang.sonar.FixedSoundSource;
 
 import edu.ucsc.eis.mario.Art;
 import edu.ucsc.eis.mario.LevelScene;
+import edu.ucsc.eis.mario.MarioComponent;
 import edu.ucsc.eis.mario.Scene;
+import edu.ucsc.eis.mario.events.Jump;
+import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.level.*;
 
 
@@ -180,6 +183,8 @@ public class Mario extends Sprite
         if (invulnerableTime > 0) invulnerableTime--;
         visible = ((invulnerableTime / 2) & 1) == 0;
 
+        if (!wasOnGround && onGround) { MarioComponent.insertFact(new Landing(this)); }
+        
         wasOnGround = onGround;
         float sideWaysSpeed = keys[KEY_SPEED] ? 1.2f : 0.6f;
         //        float sideWaysSpeed = onGround ? 2.5f : 1.2f;
@@ -215,6 +220,7 @@ public class Mario extends Sprite
             }
             else if (onGround && mayJump)
             {
+            	MarioComponent.insertFact(new Jump(this));
                 world.sound.play(Art.samples[Art.SAMPLE_MARIO_JUMP], this, 1, 1, 1);
                 xJumpSpeed = 0;
                 yJumpSpeed = -1.9f;
@@ -225,6 +231,7 @@ public class Mario extends Sprite
             }
             else if (sliding && mayJump)
             {
+            	MarioComponent.insertFact(new Jump(this));
                 world.sound.play(Art.samples[Art.SAMPLE_MARIO_JUMP], this, 1, 1, 1);
                 xJumpSpeed = -facing * 6.0f;
                 yJumpSpeed = -2.0f;

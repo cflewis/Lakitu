@@ -7,12 +7,21 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.*;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 
 import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.runtime.KnowledgeSessionConfiguration;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.runtime.conf.ClockTypeOption;
+import org.drools.runtime.rule.FactHandle;
+import org.drools.time.SessionPseudoClock;
 
 import com.mojang.sonar.FakeSoundEngine;
 import com.mojang.sonar.SonarSoundEngine;
@@ -35,7 +44,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private boolean useScale2x = false;
     private MapScene mapScene;
     int delay = 0;
-    private StatelessKnowledgeSession ksession;
+    public static StatefulKnowledgeSession ksession;
 
     private Scale2x scale2x = new Scale2x(320, 240);
 
@@ -148,12 +157,16 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         adjustFPS();
 
         while (running)
-        {
-        	if (scene instanceof LevelScene) {
-        		ksession.execute(((LevelScene) scene).mario);
-        	}
-        	
+        {	
             scene.tick();
+            
+            FactHandle marioFact = null;
+            
+        	if (scene instanceof LevelScene) {
+        		marioFact = ksession.insert(((LevelScene) scene).mario);
+        		ksession.fireAllRules();
+        		ksession.retract(marioFact);
+        	}
 
             float alpha = (float) (System.currentTimeMillis() - lTick);
             sound.clientTick(alpha);
@@ -214,8 +227,11 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 		try {
 			// load up the knowledge base
 			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");
-			ksession = kbase.newStatelessKnowledgeSession();
-			//knowledgeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "test");
+			ksession = kbase.newStatefulKnowledgeSession();
+			//KnowledgeRuntimeLogger knowledgeLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+			config.setOption( ClockTypeOption.get("realtime") );
+
 		} catch (Throwable t) {
 			t.printStackTrace();
 			System.exit(1);
@@ -313,5 +329,11 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         int fps = 24;
         delay = (fps > 0) ? (fps >= 100) ? 0 : (1000 / fps) : 100;
 //        System.out.println("Delay: " + delay);
+    }
+    
+    public static void insertFact(Object fact) {
+    	if (ksession != null) {
+    		ksession.insert(fact);
+    	}
     }
 }

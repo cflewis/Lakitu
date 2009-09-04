@@ -33,6 +33,22 @@ rule "Find landing event"
         System.err.println("Found a landing event: " + $landing);
 end
 
+/**
+* These will actually never sync up: falling off a platform
+* will create a landing with no jump. That's OK: it's only Jump + Landing 
+* revokation that we are worried about.
+*/
+//rule "Retract a jump when a landing is found"
+//    salience -1
+//    when
+//        $jump : Jump()
+//        $landing : Landing()
+//    then
+//        retract($jump);
+//        retract($landing);
+//        System.err.println("Retracting jump and landing");
+//end
+
 
 rule "Output if Mario is ducking"
 	when
@@ -65,14 +81,16 @@ rule "Prevent Mario jumping HIGHER than expected"
 end
 
 rule "Prevent Mario jumping LONGER than expected"
+    duration(2s)
     when
         //The window of time Mario jumped is too long
-        $mario : Mario()
-        $jump : Jump()
-        not(Landing(this after[0s,3s] $jump))
+        //$mario : Mario()
+        $jump : Jump($mario : mario)
+        not(Landing(this after[0s,2s] $jump))
     then
         System.err.println("Mario jumped too long");
         $mario.setJumpTime(-1);
-        $mario.setYJumpSpeed(0);
+        // 100 will bring Mario down *hard*
+        $mario.setYJumpSpeed(100);
 end
         

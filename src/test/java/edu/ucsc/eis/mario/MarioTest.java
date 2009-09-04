@@ -153,9 +153,9 @@ public class MarioTest {
 		mario.keys[Mario.KEY_JUMP] = true;
 		tickScene(1);
 		assertTrue(mario.getJumpTime() > 0);
-		tickScene(3);
+		tickScene(2);
 		assertTrue(mario.getJumpTime() > 0);
-		tickScene(20);
+		tickScene(22);
 		assertTrue(mario.getJumpTime() <= 0);
 	}
 	
@@ -173,22 +173,16 @@ public class MarioTest {
 		assertTrue(mario.getYJumpSpeed() >= 0);
 	}
 	
-	/**
-	 * This might need a change to the configuration of the knowledge
-	 * base, I'm not sure
-	 */
 	@Test
 	public void eventJump() {
 		FactHandle jumpEvent = ksession.insert(new Jump(mario));
-		ksession.insert(new Landing(mario));
+		tickScene(1);
 		
-		mario.setJumpTime(8);
-		testJump();
+		assertTrue(eos.toString().contains("Found a jump event"));
 		
 		FactHandle landingEvent = ksession.insert(new Landing(mario));
 		tickScene(1);
 		
-		assertTrue(eos.toString().contains("Found a jump event"));
 		assertFalse(eos.toString().contains("Mario jumped too long"));
 		// When Mario lands, we can retract this fact to show that he landed
 		ksession.retract(jumpEvent);
@@ -196,22 +190,16 @@ public class MarioTest {
 	}
 	
 	@Test
-	public void brokenEventJump() throws InterruptedException {
+	public void brokenEventJump() {
 		FactHandle jumpEvent = ksession.insert(new Jump(mario));
-		
 		// Cause Mario to be able to jump for *ages*
-		for (int i = 0; i < 500; i++) {
+		for (int i = 0; i < 100; i++) {
 			mario.setJumpTime(7);
 			tickScene(1);
 		}
-		
-		FactHandle landingEvent = ksession.insert(new Landing(mario));
-		
-		tickScene(1);
-		
+								
 		assertTrue(eos.toString().contains("Mario jumped too long"));
 		ksession.retract(jumpEvent);
-		ksession.retract(landingEvent);
 	}
 	
 	@Test
@@ -270,7 +258,7 @@ public class MarioTest {
 			ksession.fireAllRules();
 			scene.tick();
 			SessionPseudoClock clock = ksession.getSessionClock();
-			clock.advanceTime((1/24), TimeUnit.SECONDS);
+			clock.advanceTime(42, TimeUnit.MILLISECONDS);
 			ksession.retract(marioFact);
 		}
 	}
