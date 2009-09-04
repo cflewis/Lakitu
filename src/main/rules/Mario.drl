@@ -4,6 +4,8 @@ package edu.ucsc.eis.mario
 #list any import classes here.
 import edu.ucsc.eis.mario.sprites.Mario
 import edu.ucsc.eis.mario.events.* 
+import java.util.ArrayList
+import java.util.Iterator
 
 
 #declare any global variables here
@@ -18,7 +20,7 @@ declare Landing
     @expires(1s)
 end
 
-
+# Test rules to make sure facts are inserted
 rule "Find jump event"
     when
         $jump : Jump()
@@ -33,31 +35,38 @@ rule "Find landing event"
         System.err.println("Found a landing event: " + $landing);
 end
 
-/**
-* These will actually never sync up: falling off a platform
-* will create a landing with no jump. That's OK: it's only Jump + Landing 
-* revokation that we are worried about.
-*/
-//rule "Retract a jump when a landing is found"
-//    salience -1
-//    when
-//        $jump : Jump()
-//        $landing : Landing()
-//    then
-//        retract($jump);
-//        retract($landing);
-//        System.err.println("Retracting jump and landing");
-//end
-
-
+# Test interaction
 rule "Output if Mario is ducking"
-	when
-		$mario : Mario()
-		eval($mario.isDucking())
-	then 
-		System.err.println("Mario is ducking!");
+    when
+        $mario : Mario()
+        eval($mario.isDucking())
+    then 
+        System.err.println("Mario is ducking!");
 end
 
+# Book-keeping rules to ensure working agenda is valid from tick-to-tick
+rule "Retract all jumps when a landing is found"
+    salience -1
+    when
+        $landing : Landing()
+        $jumps : ArrayList(size > 0) from collect(Jump())
+    then
+        for (Object jump : $jumps) {
+            retract(jump);
+        }
+        
+        retract($landing);
+end
+
+rule "Retract all landings"
+    salience -2
+    when
+        $landing : Landing()
+    then
+        retract($landing);
+end
+
+# Integrity rules
 rule "Stop Mario interaction if he is dead"
     when
         $mario : Mario(deathTime > 0)
@@ -68,7 +77,7 @@ end
 /**
 * This is a hard and fast parameter bug, but won't catch
 * bugs that are caused by some other issue. For that, we'll
-* need complex event processing
+* need complex event processing, which is the next rule
 */
 
 rule "Prevent Mario jumping HIGHER than expected"
@@ -80,11 +89,10 @@ rule "Prevent Mario jumping HIGHER than expected"
         $mario.setYJumpSpeed(0);
 end
 
+//The window of time Mario jumped is too long
 rule "Prevent Mario jumping LONGER than expected"
     duration(2s)
     when
-        //The window of time Mario jumped is too long
-        //$mario : Mario()
         $jump : Jump($mario : mario)
         not(Landing(this after[0s,2s] $jump))
     then
