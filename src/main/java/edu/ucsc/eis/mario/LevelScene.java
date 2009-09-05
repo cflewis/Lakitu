@@ -77,6 +77,14 @@ public class LevelScene extends Scene implements SpriteContext
          {
          recorder.addLong(LevelGenerator.lastSeed);
          }*/
+        
+		for(int i = 0; i < level.map.length; i++) {
+			for (int j = 0; j < level.map[i].length; j++) {
+				System.out.print(level.map[i][j]);
+			}
+			
+			System.out.print("\n");
+		}
 
         if (levelType==LevelGenerator.TYPE_OVERGROUND)
             Art.startMusic(1);

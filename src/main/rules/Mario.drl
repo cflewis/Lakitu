@@ -126,4 +126,24 @@ rule "Prevent Mario jumping LONGER than expected"
         // 100 will bring Mario down *hard*
         $mario.setYJumpSpeed(100);
 end
+
+rule "Find a level with a pit"
+    when
+        Mario($pitLength : world.level.largestPitLength > 0)
+    then
+        System.out.println("Level has a pit of length: " + $pitLength);
+end
+
+/** 
+* TODO: Find out how pit length is set to 2: pits aren't ever larger than 2.
+* Is it buildJump() in the LevelGenerator?
+* - Intelligent operation is to work out how fast Mario can go before he jumps,
+* then predict how far he can jump. This is a bit overkill, so we'll just
+* detect jumps longer >= 4 blocks when there aren't any of those gray
+* building blocks surrounding, or >= 2 when there are.
+* The resolution of this will be to splice in a block on the end.
+* - This evaluation shouldn't happen as a reference follow from the Mario fact,
+* it should be it's own fact inserted into the rule engine (which could be a
+* rule, using a not(LevelScene()) to make sure we only insert once).
+*/  
         

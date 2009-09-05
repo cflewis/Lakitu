@@ -234,6 +234,17 @@ public class MarioTest {
 		assertTrue(mario.sheet == Art.fireMario);
 	}
 	
+	@Test
+	public void testOutputLevel() {
+		for(int i = 0; i < scene.level.map.length; i++) {
+			for (int j = 0; j < scene.level.map[i].length; j++) {
+				System.out.print(scene.level.map[i][j]);
+			}
+			
+			System.out.print("\n");
+		}
+	}
+	
 	/**
 	 * This satisfies the "Action when not allowed" bug.
 	 * As this kills Mario, this should either be tested at the end,

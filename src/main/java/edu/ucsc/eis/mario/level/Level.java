@@ -78,6 +78,7 @@ public class Level
             dis.readFully(level.map[i]);
             dis.readFully(level.data[i]);
         }
+        
         return level;
     }
 
@@ -169,5 +170,30 @@ public class Level
         if (x >= width) return;
         if (y >= height) return;
         spriteTemplates[x][y] = spriteTemplate;
+    }
+    
+    // FIXME: Added by me
+    public int largestPitLength() {
+    	int largestPitLength = 0;
+    	int pitCounter = 0;
+    	
+    	for (int i = 0; i < map.length; i++) {
+    		int byteTotal = 0;
+    		
+    		for (int j = 0; j < map[i].length; j++) {
+    			byteTotal = byteTotal + map[i][j];
+    		}
+    		
+    		if (byteTotal == 0) { pitCounter++; }
+    		else {
+    			if (pitCounter > largestPitLength) {
+    				largestPitLength = pitCounter;
+    			}
+    			byteTotal = 0;
+    			pitCounter = 0;
+    		}
+    	}
+    	
+    	return largestPitLength;
     }
 }
