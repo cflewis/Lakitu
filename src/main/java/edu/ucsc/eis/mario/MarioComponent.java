@@ -155,17 +155,25 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 
         toTitle();
         adjustFPS();
+        
+        FactHandle marioFact = null;
 
         while (running)
         {	
             scene.tick();
-            
-            FactHandle marioFact = null;
-            
+                        
         	if (scene instanceof LevelScene) {
-        		marioFact = ksession.insert(((LevelScene) scene).mario);
+        		Mario mario = ((LevelScene) scene).mario;
+        		if (marioFact == null) {
+        			marioFact = ksession.insert(mario);
+        		}
+        		else
+        		{
+        			ksession.update(marioFact, mario);
+        		}
+        		
         		ksession.fireAllRules();
-        		ksession.retract(marioFact);
+        		ksession.update(marioFact, mario);
         	}
 
             float alpha = (float) (System.currentTimeMillis() - lTick);

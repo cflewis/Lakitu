@@ -6,6 +6,7 @@ import edu.ucsc.eis.mario.sprites.Mario
 import edu.ucsc.eis.mario.events.* 
 import java.util.ArrayList
 import java.util.Iterator
+import function org.mockito.Mockito.*; 
 
 
 #declare any global variables here
@@ -67,12 +68,36 @@ rule "Retract all landings"
 end
 
 # Integrity rules
+rule "Stop Mario moving when he dies"
+    when
+        $mario : Mario(deathTime == 1)
+    then
+        $mario.xa = 0;
+        $mario.ya = 0;
+end        
+
 rule "Stop Mario interaction if he is dead"
     when
         $mario : Mario(deathTime > 0)
     then
+        $mario.keys = new boolean[16];
         System.err.println("Mario is dead");
 end
+
+/**
+* This one will only work if a new fact is inserted, as updating Mario
+* results in an implicit retraction and insertion, killing the activation
+* for this rule. An immutable object (only need one, so the inserting rule
+* should check for not(deathEvent())) could be inserted into the memory on the
+* rules side instead, and the duration calculated on that.
+*/
+//rule "End level if Mario dies"
+//    duration(1s)
+//    when
+//        $mario : Mario(deathTime > 0)
+//    then
+//        System.err.println("Mario should be dead now");
+//end
 
 /**
 * This is a hard and fast parameter bug, but won't catch
