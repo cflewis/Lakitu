@@ -12,11 +12,23 @@ import org.drools.io.ResourceFactory;
 import com.google.common.base.Preconditions;
 
 public class KnowledgeReader {
-	public static KnowledgeBase getKnowledgeBase(String ruleResource) 
+	public static KnowledgeBase getKnowledgeBase(String ruleResource) {
+		return getKnowledgeBase(ruleResource, null);
+	}
+	
+	public static KnowledgeBase getKnowledgeBase(String ruleResource, 
+			String ruleFlowResource) 
 		throws IllegalArgumentException {
 		Preconditions.checkNotNull(ruleResource, "Must pass a resource");
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource(ruleResource), ResourceType.DRL);
+		kbuilder.add(ResourceFactory.newClassPathResource(ruleResource), 
+				ResourceType.DRL);
+		
+		if (ruleFlowResource != null) {
+			kbuilder.add(ResourceFactory.newClassPathResource(ruleFlowResource), 
+					ResourceType.DRF);
+		}
+		
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		
 		if (errors.size() > 0) {

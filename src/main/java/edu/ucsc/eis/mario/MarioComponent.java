@@ -234,7 +234,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private void initKnowledgeSession() {
 		try {
 			// load up the knowledge base
-			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");
+			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl", "Mario.rf");
 			ksession = kbase.newStatefulKnowledgeSession();
 			//KnowledgeRuntimeLogger knowledgeLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();

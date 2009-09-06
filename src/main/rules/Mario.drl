@@ -22,7 +22,7 @@ declare Landing
 end
 
 # Test rules to make sure facts are inserted
-rule "Find jump event"
+rule "jumpEventFound"
     when
         $jump : Jump()
     then
@@ -37,7 +37,7 @@ rule "Find landing event"
 end
 
 # Test interaction
-rule "Output if Mario is ducking"
+rule "marioIsDucking"
     when
         $mario : Mario()
         eval($mario.isDucking())
@@ -76,7 +76,7 @@ rule "Stop Mario moving when he dies"
         $mario.ya = 0;
 end        
 
-rule "Stop Mario interaction if he is dead"
+rule "stopMarioInteractionWhenDead"
     when
         $mario : Mario(deathTime > 0)
     then
@@ -105,7 +105,7 @@ end
 * need complex event processing, which is the next rule
 */
 
-rule "Prevent Mario jumping HIGHER than expected"
+rule "marioTooHigh"
     when
         $mario : Mario(jumpTime > 8)
     then
@@ -115,7 +115,7 @@ rule "Prevent Mario jumping HIGHER than expected"
 end
 
 //The window of time Mario jumped is too long
-rule "Prevent Mario jumping LONGER than expected"
+rule "marioJumpTooLong"
     duration(2s)
     when
         $jump : Jump($mario : mario)
@@ -146,4 +146,4 @@ end
 * it should be it's own fact inserted into the rule engine (which could be a
 * rule, using a not(LevelScene()) to make sure we only insert once).
 */  
-        
+   

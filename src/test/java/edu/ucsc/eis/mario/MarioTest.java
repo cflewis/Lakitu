@@ -10,7 +10,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
 
+import org.drools.base.RuleNameEqualsAgendaFilter;
 import org.drools.runtime.conf.ClockTypeOption;
+import org.drools.spi.AgendaFilter;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -53,8 +55,7 @@ public class MarioTest {
 	LevelScene scene;
 	Mario mario;
 	StatefulKnowledgeSession ksession;
-	OutputStream os;
-	OutputStream eos;
+	TrackingAgendaEventListener trackingAgendaEventListener;
 	
 	@Before
 	public void setUp() {
@@ -86,19 +87,17 @@ public class MarioTest {
 				
 		try {
 			// load up the knowledge base
-			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");
+			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");//, "Mario.rf");
 			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
 			config.setOption(ClockTypeOption.get("pseudo"));
 			ksession = kbase.newStatefulKnowledgeSession(config, null);
 			//knowledgeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "test");
+			trackingAgendaEventListener = new TrackingAgendaEventListener();
+			ksession.addEventListener(trackingAgendaEventListener);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			System.exit(1);
 		}
-				
-		eos = new ByteArrayOutputStream();
-		PrintStream eps = new PrintStream(eos);
-		System.setErr(eps);
 		
 		tickScene(500);
 	}
@@ -107,7 +106,6 @@ public class MarioTest {
 	public void tearDown() {
 		// Reset the knowledge base
 		ksession.dispose();
-		System.out.print(eos);
 	}
 	
 	@Test
@@ -166,7 +164,7 @@ public class MarioTest {
 				mario.getJumpTime() == 50);
 		tickScene(1);
 		// Rule engine should now kick in and stop the silly value
-		assertTrue(eos.toString().contains("Mario jumped too high"));
+		assertFired("marioTooHigh");
 		tickScene(1);
 		assertTrue(mario.getJumpTime() <= 0);
 		// Y is counted top to bottom, so higher Y is lower on screen
@@ -177,13 +175,12 @@ public class MarioTest {
 	public void eventJump() {
 		FactHandle jumpEvent = ksession.insert(new Jump(mario));
 		tickScene(1);
-		
-		assertTrue(eos.toString().contains("Found a jump event"));
+		assertFired("jumpEventFound");
 		
 		FactHandle landingEvent = ksession.insert(new Landing(mario));
 		tickScene(1);
 		
-		assertFalse(eos.toString().contains("Mario jumped too long"));
+		assertNotFired("marioJumpTooLong");
 		// When Mario lands, we can retract this fact to show that he landed
 		ksession.retract(jumpEvent);
 		ksession.retract(landingEvent);
@@ -197,8 +194,8 @@ public class MarioTest {
 			mario.setJumpTime(7);
 			tickScene(1);
 		}
-								
-		assertTrue(eos.toString().contains("Mario jumped too long"));
+
+		assertFired("marioJumpTooLong");
 		ksession.retract(jumpEvent);
 	}
 	
@@ -219,7 +216,7 @@ public class MarioTest {
 		tickScene(1);
 		assertTrue(mario.isDucking());
 		tickScene(1);
-		assertTrue(eos.toString().contains("Mario is ducking"));
+		assertFired("marioIsDucking");
 	}
 	
 	/**
@@ -260,7 +257,7 @@ public class MarioTest {
 		mario.keys[Mario.KEY_RIGHT] = true;
 		tickScene(1);
 		assertTrue(oldX == mario.x);
-		assertTrue(eos.toString().contains("Mario is dead"));
+		assertFired("stopMarioInteractionWhenDead");
 	}
 	
 	private void tickScene(int ticks) {
@@ -272,5 +269,16 @@ public class MarioTest {
 			clock.advanceTime(42, TimeUnit.MILLISECONDS);
 			ksession.retract(marioFact);
 		}
+	}
+	
+	private void assertFired(String ruleName) {
+		//ksession.fireAllRules(new RuleNameEqualsAgendaFilter(ruleName));
+		ksession.fireAllRules();
+		assertTrue(trackingAgendaEventListener.isRuleFired(ruleName));
+	}
+	
+	private void assertNotFired(String ruleName) {
+		ksession.fireAllRules();
+		assertFalse(trackingAgendaEventListener.isRuleFired(ruleName));
 	}
 }

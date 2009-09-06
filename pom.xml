@@ -7,6 +7,10 @@
   <version>0.0.1-SNAPSHOT</version>
   <description>A version of Infinite Mario Bros. with a rules engine enforcing integrity.</description>
 
+  <properties>
+    <drools.version>5.0.1</drools.version>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -19,11 +23,21 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+  	<repository>
+  		<id>jboss</id>
+  		<name>Jboss</name>
+  		<url>http://repository.jboss.com/maven2</url>
+  		<snapshots>
+  			<enabled>false</enabled>
+  		</snapshots>
+  	</repository>
+  </repositories>
   <dependencies>
   	<dependency>
   		<groupId>org.drools</groupId>
   		<artifactId>drools-core</artifactId>
-  		<version>5.0.1</version>
+  		<version>${drools.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>com.google.collections</groupId>
@@ -33,22 +47,22 @@
   	<dependency>
   		<groupId>org.drools</groupId>
   		<artifactId>drools-api</artifactId>
-  		<version>5.0.1</version>
+  		<version>${drools.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>org.drools</groupId>
   		<artifactId>drools-compiler</artifactId>
-  		<version>5.0.1</version>
+  		<version>${drools.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>org.drools</groupId>
   		<artifactId>drools-decisiontables</artifactId>
-  		<version>5.0.1</version>
+  		<version>${drools.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>org.drools</groupId>
   		<artifactId>drools-jsr94</artifactId>
-  		<version>5.0.1</version>
+  		<version>${drools.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>junit</groupId>
