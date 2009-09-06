@@ -11,6 +11,7 @@ import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.base.RuleNameEqualsAgendaFilter;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.conf.ClockTypeOption;
 import org.drools.spi.AgendaFilter;
 import org.drools.runtime.rule.FactHandle;
@@ -87,11 +88,11 @@ public class MarioTest {
 				
 		try {
 			// load up the knowledge base
-			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl");//, "Mario.rf");
+			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl", "Mario.rf");
 			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
 			config.setOption(ClockTypeOption.get("pseudo"));
 			ksession = kbase.newStatefulKnowledgeSession(config, null);
-			//knowledgeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "test");
+			KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			trackingAgendaEventListener = new TrackingAgendaEventListener();
 			ksession.addEventListener(trackingAgendaEventListener);
 		} catch (Throwable t) {
@@ -263,6 +264,7 @@ public class MarioTest {
 	private void tickScene(int ticks) {
 		for (int i = 0; i < ticks; i++) {
 			FactHandle marioFact = ksession.insert(mario);
+			ksession.startProcess("Mario");
 			ksession.fireAllRules();
 			scene.tick();
 			SessionPseudoClock clock = ksession.getSessionClock();
@@ -273,11 +275,13 @@ public class MarioTest {
 	
 	private void assertFired(String ruleName) {
 		//ksession.fireAllRules(new RuleNameEqualsAgendaFilter(ruleName));
+		ksession.startProcess("Mario");
 		ksession.fireAllRules();
 		assertTrue(trackingAgendaEventListener.isRuleFired(ruleName));
 	}
 	
 	private void assertNotFired(String ruleName) {
+		ksession.startProcess("Mario");
 		ksession.fireAllRules();
 		assertFalse(trackingAgendaEventListener.isRuleFired(ruleName));
 	}

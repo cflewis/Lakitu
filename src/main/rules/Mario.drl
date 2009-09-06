@@ -23,6 +23,7 @@ end
 
 # Test rules to make sure facts are inserted
 rule "jumpEventFound"
+    ruleflow-group "Test"
     when
         $jump : Jump()
     then
@@ -30,6 +31,7 @@ rule "jumpEventFound"
 end
 
 rule "Find landing event"
+    ruleflow-group "Test"
     when
         $landing : Landing()
     then
@@ -38,6 +40,7 @@ end
 
 # Test interaction
 rule "marioIsDucking"
+    ruleflow-group "Test"
     when
         $mario : Mario()
         eval($mario.isDucking())
@@ -47,7 +50,7 @@ end
 
 # Book-keeping rules to ensure working agenda is valid from tick-to-tick
 rule "Retract all jumps when a landing is found"
-    salience -1
+    ruleflow-group "Bookkeeping"
     when
         $landing : Landing()
         $jumps : ArrayList(size > 0) from collect(Jump())
@@ -60,7 +63,8 @@ rule "Retract all jumps when a landing is found"
 end
 
 rule "Retract all landings"
-    salience -2
+    ruleflow-group "Bookkeeping"
+    salience -1
     when
         $landing : Landing()
     then
@@ -69,6 +73,7 @@ end
 
 # Integrity rules
 rule "Stop Mario moving when he dies"
+    ruleflow-group "Integrity"
     when
         $mario : Mario(deathTime == 1)
     then
@@ -77,6 +82,7 @@ rule "Stop Mario moving when he dies"
 end        
 
 rule "stopMarioInteractionWhenDead"
+    ruleflow-group "Integrity"
     when
         $mario : Mario(deathTime > 0)
     then
@@ -106,6 +112,7 @@ end
 */
 
 rule "marioTooHigh"
+    ruleflow-group "Integrity"
     when
         $mario : Mario(jumpTime > 8)
     then
@@ -116,6 +123,7 @@ end
 
 //The window of time Mario jumped is too long
 rule "marioJumpTooLong"
+    ruleflow-group "Integrity"
     duration(2s)
     when
         $jump : Jump($mario : mario)
@@ -128,6 +136,7 @@ rule "marioJumpTooLong"
 end
 
 rule "Find a level with a pit"
+    ruleflow-group "Integrity"
     when
         Mario($pitLength : world.level.largestPitLength > 0)
     then
