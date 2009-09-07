@@ -8,6 +8,8 @@ import java.awt.image.ImageObserver;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.base.RuleNameEqualsAgendaFilter;
@@ -36,6 +38,7 @@ import static org.junit.Assert.*;
 import edu.ucsc.eis.mario.events.Jump;
 import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.level.LevelGenerator;
+import edu.ucsc.eis.mario.level.Pit;
 import edu.ucsc.eis.mario.sprites.Enemy;
 import edu.ucsc.eis.mario.sprites.Mario;
 import edu.ucsc.eis.mario.sprites.Shell;
@@ -73,7 +76,8 @@ public class MarioTest {
 		Art.init(null, new FakeSoundEngine());
 		
 		MarioComponent marioComponent = mock(MarioComponent.class);
-		scene = spy(new LevelScene(graphicsConfiguration, marioComponent, 3581986689337283420l, 1, 
+
+		scene = spy(new LevelScene(graphicsConfiguration, marioComponent, -8821502137513047579l, 1, 
 				LevelGenerator.TYPE_OVERGROUND));
 		SonarSoundEngine sound = mock(SonarSoundEngine.class);
 		scene.sound = sound;
@@ -92,7 +96,7 @@ public class MarioTest {
 			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
 			config.setOption(ClockTypeOption.get("pseudo"));
 			ksession = kbase.newStatefulKnowledgeSession(config, null);
-			KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+			//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			trackingAgendaEventListener = new TrackingAgendaEventListener();
 			ksession.addEventListener(trackingAgendaEventListener);
 		} catch (Throwable t) {
@@ -112,6 +116,32 @@ public class MarioTest {
 	@Test
 	public void testSetup() {
 		assertTrue(true);
+	}
+	
+	@Test
+	public void testSceneDetection() {
+		ksession.insert(scene);
+		assertFired("levelSceneFound");
+		assertFired("levelFound");
+		assertFired("pitFound");
+	}
+	
+	@Test
+	public void testPitDetection() {
+		// Create a pit by hand
+		for (int x = 20; x < 30; x++) {
+			for (int y = 0; y < scene.getLevel().height; y++) {
+				scene.level.setBlock(x, y, (byte) 0);
+			}
+		}
+		
+		scene.level.pits = new ArrayList<Pit>();
+		scene.level.pits.add(new Pit(20, 29, false));
+		
+		ksession.insert(scene);
+		assertFired("pitFound");
+		assertFired("pitTooLong");
+		assertFalse(scene.level.getBlock(29, scene.level.height - 1) == (byte) 0);
 	}
 	
 	@Test 
@@ -231,17 +261,7 @@ public class MarioTest {
 		testFlower();
 		assertTrue(mario.sheet == Art.fireMario);
 	}
-	
-	@Test
-	public void testOutputLevel() {
-		for(int i = 0; i < scene.level.map.length; i++) {
-			for (int j = 0; j < scene.level.map[i].length; j++) {
-				System.out.print(scene.level.map[i][j]);
-			}
-			
-			System.out.print("\n");
-		}
-	}
+
 	
 	/**
 	 * This satisfies the "Action when not allowed" bug.

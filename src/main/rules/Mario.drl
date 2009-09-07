@@ -4,9 +4,10 @@ package edu.ucsc.eis.mario
 #list any import classes here.
 import edu.ucsc.eis.mario.sprites.Mario
 import edu.ucsc.eis.mario.events.* 
+import edu.ucsc.eis.mario.level.Pit
 import java.util.ArrayList
 import java.util.Iterator
-import function org.mockito.Mockito.*; 
+import function org.mockito.Mockito.* 
 
 
 #declare any global variables here
@@ -30,12 +31,37 @@ rule "jumpEventFound"
         System.err.println("Found a jump event: " + $jump);
 end
 
-rule "Find landing event"
+rule "landingEventFound"
     ruleflow-group "Test"
     when
         $landing : Landing()
     then
         System.err.println("Found a landing event: " + $landing);
+end
+
+rule "levelSceneFound"
+    ruleflow-group "Test"
+    when
+        $levelScene : LevelScene()
+    then
+        System.err.println("Found a level scene: " + $levelScene);
+end
+
+rule "levelFound"
+    ruleflow-group "Test"
+    when
+        LevelScene($level : level)
+    then
+        System.err.println("Found a level: " + $level);
+end
+
+rule "pitFound"
+    ruleflow-group "Test"
+    when
+        LevelScene($level : level)
+        $pit : Pit() from $level.pits
+    then
+        System.err.println("Found a pit: " + $pit);
 end
 
 # Test interaction
@@ -135,12 +161,31 @@ rule "marioJumpTooLong"
         $mario.setYJumpSpeed(100);
 end
 
-rule "Find a level with a pit"
+rule "pitTooLong"
     ruleflow-group "Integrity"
     when
-        Mario($pitLength : world.level.largestPitLength > 0)
+        LevelScene($level : level)
+        $pit : Pit((length > 4 && hasStairs == true) || 
+            (length > 6 && hasStairs == false)) 
+            from $level.pits
     then
-        System.out.println("Level has a pit of length: " + $pitLength);
+        int requiredLength = 6;
+        int requiredHeight = 1;
+        
+        if ($pit.hasStairs == true) { 
+            requiredLength = 4;
+            requiredHeight = 3; 
+        }
+        
+        for (int x = $pit.getEndX(); x >= ($pit.getStartX() + requiredLength); x--) {
+            $level.setBlock(x, $level.height - 1, (byte) (9 + 0 * 16));
+            
+            for (int y = 1; y <= requiredHeight; y++) {
+                $level.setBlock(x, $level.height - y, (byte) (9 + 0 * 16)); 
+            }
+        }
+        
+        System.err.println("Found pit that is too long: " + $pit);
 end
 
 /** 

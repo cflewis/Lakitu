@@ -148,12 +148,21 @@ public class LevelGenerator
     private int buildJump(int xo, int maxLength)
     {
         int js = random.nextInt(4) + 2;
-        int jl = random.nextInt(2) + 2;
+    	int jl = random.nextInt(2) + 2;
         int length = js * 2 + jl;
 
         boolean hasStairs = random.nextInt(3) == 0;
-
+        
+        level.pits.add(new Pit(xo + js, xo + length - js - 1, hasStairs));
+        
         int floor = height - 1 - random.nextInt(4);
+        
+        /**
+         * Length and JL (jump length) are the key here. The first if statement evaluates
+         * the blocks on either side of the jump. This implicitly leaves
+         * the ones in the middle blank. The +2 on JL ensures the jump
+         * is at least two blocks long, the randomInt means it can be at most 4.
+         */
         for (int x = xo; x < xo + length; x++)
         {
             if (x < xo + js || x > xo + length - js - 1)

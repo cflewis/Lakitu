@@ -485,7 +485,11 @@ public class LevelScene extends Scene implements SpriteContext
         return 0;
     }
 
-    public void bump(int x, int y, boolean canBreakBricks)
+    public Level getLevel() {
+		return level;
+	}
+
+	public void bump(int x, int y, boolean canBreakBricks)
     {
         byte block = level.getBlock(x, y);
 

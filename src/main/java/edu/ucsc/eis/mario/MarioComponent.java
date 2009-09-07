@@ -45,6 +45,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private MapScene mapScene;
     int delay = 0;
     public static StatefulKnowledgeSession ksession;
+    FactHandle sceneHandle;
 
     private Scale2x scale2x = new Scale2x(320, 240);
 
@@ -172,6 +173,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         			ksession.update(marioFact, mario);
         		}
         		
+        		ksession.startProcess("Mario");
         		ksession.fireAllRules();
         		ksession.update(marioFact, mario);
         	}
@@ -268,12 +270,15 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     public void startLevel(long seed, int difficulty, int type)
     {
         scene = new LevelScene(graphicsConfiguration, this, seed, difficulty, type);
+        LevelScene ls = (LevelScene) scene;
         scene.setSound(sound);
         scene.init();
+        sceneHandle = ksession.insert(ls);
     }
 
     public void levelFailed()
     {
+    	ksession.retract(sceneHandle);
         scene = mapScene;
         mapScene.startMusic();
         Mario.lives--;
