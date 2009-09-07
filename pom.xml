@@ -12,6 +12,11 @@
   </properties>
 
   <build>
+  	<resources>
+  		<resource>
+  			<directory>src/main/rules</directory>
+  		</resource>
+  	</resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -75,7 +80,7 @@
   		<version>1.8.0</version>
   	</dependency>
   	<dependency>
-  		<groupId>xstream</groupId>
+  		<groupId>com.thoughtworks.xstream</groupId>
   		<artifactId>xstream</artifactId>
   		<version>1.2.2</version>
   	</dependency>
