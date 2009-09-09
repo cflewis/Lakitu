@@ -261,6 +261,33 @@ public class MarioTest {
 		testFlower();
 		assertTrue(mario.sheet == Art.fireMario);
 	}
+	
+	@Test
+	public void testBrokenSmallAnimationSheet() {
+		Mario.large = false;
+		Mario.fire = false;
+		mario.sheet = Art.fireMario;
+		assertFired("marioAnimationSmall");
+		assertTrue(mario.sheet == Art.smallMario);
+	}
+	
+	@Test
+	public void testBrokenLargeAnimationSheet() {
+		Mario.large = true;
+		Mario.fire = false;
+		mario.sheet = Art.fireMario;
+		assertFired("marioAnimationLarge");
+		assertTrue(mario.sheet == Art.mario);
+	}
+	
+	@Test
+	public void testBrokenFireAnimationSheet() {
+		Mario.large = true;
+		Mario.fire = true;
+		mario.sheet = Art.smallMario;
+		assertFired("marioAnimationFire");
+		assertTrue(mario.sheet == Art.fireMario);
+	}
 
 	
 	/**

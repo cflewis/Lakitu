@@ -764,4 +764,12 @@ public class Mario extends Sprite
 	public int getDeathTime() {
 		return deathTime;
 	}
+
+	public static boolean isLarge() {
+		return large;
+	}
+
+	public static boolean isFire() {
+		return fire;
+	}
 }

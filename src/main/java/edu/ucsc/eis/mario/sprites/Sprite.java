@@ -75,7 +75,7 @@ public class Sprite implements SoundSource
         move();
     }
 
-    public final void tickNoMove()
+	public final void tickNoMove()
     {
         xOld = x;
         yOld = y;
@@ -112,4 +112,8 @@ public class Sprite implements SoundSource
     {
         return false;
     }
+    
+    public Image[][] getSheet() {
+		return sheet;
+	}
 }
