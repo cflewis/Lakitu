@@ -64,6 +64,14 @@ rule "pitFound"
         System.err.println("Found a pit: " + $pit);
 end
 
+rule "marioFound"
+    ruleflow-group "Test"
+    when
+        $mario : Mario()
+    then
+        //System.err.println("Mario art is: " + $mario.getSheet());
+end
+
 # Test interaction
 rule "marioIsDucking"
     ruleflow-group "Test"
@@ -188,16 +196,38 @@ rule "pitTooLong"
         System.err.println("Found pit that is too long: " + $pit);
 end
 
-/** 
-* TODO: Find out how pit length is set to 2: pits aren't ever larger than 2.
-* Is it buildJump() in the LevelGenerator?
-* - Intelligent operation is to work out how fast Mario can go before he jumps,
-* then predict how far he can jump. This is a bit overkill, so we'll just
-* detect jumps longer >= 4 blocks when there aren't any of those gray
-* building blocks surrounding, or >= 2 when there are.
-* The resolution of this will be to splice in a block on the end.
-* - This evaluation shouldn't happen as a reference follow from the Mario fact,
-* it should be it's own fact inserted into the rule engine (which could be a
-* rule, using a not(LevelScene()) to make sure we only insert once).
-*/  
+rule "marioAnimationSmall"
+    ruleflow-group "Integrity"
+    when
+        $mario : Mario(sheet != Art.smallMario)
+        eval($mario.isLarge() == false)
+        eval($mario.isFire() == false)
+    then
+        $mario.sheet = Art.smallMario;
+        System.err.println("Mario set to small art");
+end
+
+rule "marioAnimationLarge"
+    ruleflow-group "Integrity"
+    when
+        $mario : Mario(sheet != Art.mario)
+        eval($mario.isLarge() == true)
+        eval($mario.isFire() == false)
+    then
+        $mario.sheet = Art.mario;
+        System.err.println("Mario set to large art");
+end
+
+rule "marioAnimationFire"
+    ruleflow-group "Integrity"
+    when
+        $mario : Mario(sheet != Art.fireMario)
+        eval($mario.isFire() == true)
+    then
+        $mario.sheet = Art.fireMario;
+        System.err.println("Mario set to fire art");
+end
+
+
+ 
    

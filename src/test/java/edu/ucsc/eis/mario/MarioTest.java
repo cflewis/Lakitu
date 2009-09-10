@@ -6,11 +6,14 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
 
 import org.drools.base.RuleNameEqualsAgendaFilter;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
@@ -62,7 +65,7 @@ public class MarioTest {
 	TrackingAgendaEventListener trackingAgendaEventListener;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		GraphicsConfiguration graphicsConfiguration = mock(GraphicsConfiguration.class);
 		BufferedImage image = mock(BufferedImage.class);
 		when(image.getWidth()).thenReturn(100);
@@ -74,7 +77,8 @@ public class MarioTest {
 		when(image.getGraphics()).thenReturn(g);
 		
 		Art.init(null, new FakeSoundEngine());
-		
+		initArt();
+
 		MarioComponent marioComponent = mock(MarioComponent.class);
 
 		scene = spy(new LevelScene(graphicsConfiguration, marioComponent, -8821502137513047579l, 1, 
@@ -112,7 +116,7 @@ public class MarioTest {
 		// Reset the knowledge base
 		ksession.dispose();
 	}
-	
+		
 	@Test
 	public void testSetup() {
 		assertTrue(true);
@@ -266,7 +270,10 @@ public class MarioTest {
 	public void testBrokenSmallAnimationSheet() {
 		Mario.large = false;
 		Mario.fire = false;
+		assertFalse(Mario.large);
+		assertFalse(Mario.fire);
 		mario.sheet = Art.fireMario;
+		assertTrue(mario.sheet == Art.fireMario);
 		assertFired("marioAnimationSmall");
 		assertTrue(mario.sheet == Art.smallMario);
 	}
@@ -275,7 +282,10 @@ public class MarioTest {
 	public void testBrokenLargeAnimationSheet() {
 		Mario.large = true;
 		Mario.fire = false;
+		assertTrue(Mario.large);
+		assertFalse(Mario.fire);
 		mario.sheet = Art.fireMario;
+		assertTrue(mario.sheet == Art.fireMario);
 		assertFired("marioAnimationLarge");
 		assertTrue(mario.sheet == Art.mario);
 	}
@@ -322,6 +332,7 @@ public class MarioTest {
 	
 	private void assertFired(String ruleName) {
 		//ksession.fireAllRules(new RuleNameEqualsAgendaFilter(ruleName));
+		tickScene(1);
 		ksession.startProcess("Mario");
 		ksession.fireAllRules();
 		assertTrue(trackingAgendaEventListener.isRuleFired(ruleName));
@@ -331,5 +342,21 @@ public class MarioTest {
 		ksession.startProcess("Mario");
 		ksession.fireAllRules();
 		assertFalse(trackingAgendaEventListener.isRuleFired(ruleName));
+	}
+	
+	private void initArt() throws IOException {
+		Image sheet;
+		
+		sheet = ImageIO.read(Art.class.getResourceAsStream("/smallmariosheet.png"));
+		Art.smallMario = new Image[sheet.getWidth(null)][sheet.getHeight(null)];
+		Art.smallMario[0][0] = sheet;
+		
+		sheet = ImageIO.read(Art.class.getResourceAsStream("/mariosheet.png"));
+		Art.mario = new Image[sheet.getWidth(null)][sheet.getHeight(null)];
+		Art.mario[0][0] = sheet;
+		
+		sheet = ImageIO.read(Art.class.getResourceAsStream("/firemariosheet.png"));
+		Art.fireMario = new Image[sheet.getWidth(null)][sheet.getHeight(null)];
+		Art.fireMario[0][0] = sheet;
 	}
 }
