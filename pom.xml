@@ -34,18 +34,9 @@
         <artifactId>simple-grester</artifactId>
         <version>1.0</version>
         <configuration>
-          <codeSources>src/main/java/edu/ucsc/eis/mario/sprites/</codeSources>
+          <codeSources>src/main/java/edu/ucsc/eis/mario/sprites/Mario.java</codeSources>
           <testSuiteClass>edu.ucsc.eis.mario.sprites.MarioTest</testSuiteClass>
         </configuration>
-        <executions>
-          <execution>
-            <id>inspectSourcesCodeWithGrester</id>
-            <phase>test</phase>
-            <goals>
-              <goal>inspect</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
