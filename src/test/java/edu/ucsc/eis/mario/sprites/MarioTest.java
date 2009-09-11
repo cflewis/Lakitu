@@ -1,4 +1,4 @@
-package edu.ucsc.eis.mario;
+package edu.ucsc.eis.mario.sprites;
 
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -42,9 +42,7 @@ import edu.ucsc.eis.mario.events.Jump;
 import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.level.LevelGenerator;
 import edu.ucsc.eis.mario.level.Pit;
-import edu.ucsc.eis.mario.sprites.Enemy;
-import edu.ucsc.eis.mario.sprites.Mario;
-import edu.ucsc.eis.mario.sprites.Shell;
+import edu.ucsc.eis.mario.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -77,6 +75,7 @@ public class MarioTest {
 		when(image.getGraphics()).thenReturn(g);
 		
 		Art.init(null, new FakeSoundEngine());
+		Art.disableSound();
 		initArt();
 
 		MarioComponent marioComponent = mock(MarioComponent.class);

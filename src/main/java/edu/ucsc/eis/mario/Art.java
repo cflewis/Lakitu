@@ -189,4 +189,9 @@ public class Art
             }
         }
     }
+    
+    public static void disableMusic()
+    {
+    	sequencer = null;
+    }
 }
