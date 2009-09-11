@@ -75,7 +75,7 @@ public class MarioTest {
 		when(image.getGraphics()).thenReturn(g);
 		
 		Art.init(null, new FakeSoundEngine());
-		Art.disableSound();
+		Art.disableMusic();
 		initArt();
 
 		MarioComponent marioComponent = mock(MarioComponent.class);
