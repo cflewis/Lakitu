@@ -28,6 +28,7 @@ import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.time.SessionPseudoClock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.mojang.sonar.FakeSoundEngine;
@@ -62,6 +63,23 @@ public class MarioTest {
 	StatefulKnowledgeSession ksession;
 	TrackingAgendaEventListener trackingAgendaEventListener;
 	
+	@BeforeClass
+	public void oneTimeSetUp() {
+		try {
+			// load up the knowledge base
+			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl", "Mario.rf");
+			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+			config.setOption(ClockTypeOption.get("pseudo"));
+			ksession = kbase.newStatefulKnowledgeSession(config, null);
+			//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+			trackingAgendaEventListener = new TrackingAgendaEventListener();
+			ksession.addEventListener(trackingAgendaEventListener);
+		} catch (Throwable t) {
+			t.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
 	@Before
 	public void setUp() throws IOException {
 		GraphicsConfiguration graphicsConfiguration = mock(GraphicsConfiguration.class);
@@ -91,22 +109,8 @@ public class MarioTest {
 		mario = scene.mario;
 		Mario.resetStatic();
 		mario.deathTime = 0;
-				
-		try {
-			// load up the knowledge base
-			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl", "Mario.rf");
-			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
-			config.setOption(ClockTypeOption.get("pseudo"));
-			ksession = kbase.newStatefulKnowledgeSession(config, null);
-			//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-			trackingAgendaEventListener = new TrackingAgendaEventListener();
-			ksession.addEventListener(trackingAgendaEventListener);
-		} catch (Throwable t) {
-			t.printStackTrace();
-			System.exit(1);
-		}
 		
-		tickScene(500);
+		tickScene(100);
 	}
 	
 	@After
@@ -242,13 +246,11 @@ public class MarioTest {
 		tickScene(1);
 		
 		assertFalse(mario.isDucking());
-		tickScene(1);
 		
 		Mario.large = true;
 		assertTrue(Mario.large);
 		tickScene(1);
 		assertTrue(mario.isDucking());
-		tickScene(1);
 		assertFired("marioIsDucking");
 	}
 	

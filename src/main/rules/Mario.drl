@@ -76,10 +76,9 @@ end
 rule "marioIsDucking"
     ruleflow-group "Test"
     when
-        $mario : Mario()
-        eval($mario.isDucking())
+        $mario : Mario(ducking == true)
     then 
-        System.err.println("Mario is ducking!");
+        //System.err.println("Mario is ducking!");
 end
 
 # Book-keeping rules to ensure working agenda is valid from tick-to-tick
