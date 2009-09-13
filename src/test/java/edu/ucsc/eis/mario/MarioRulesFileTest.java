@@ -114,6 +114,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		assertTrue(mario.getX() == -21);
 		assertTrue(mario.deathTime == 0);
 		assertFired("marioOutOfBounds");
+		mario.deathTime = 0;
 		mario.x = (scene.level.height * 16) + 1;
 		assertTrue(mario.getX() == (scene.level.height * 16) + 1);
 		assertTrue(mario.deathTime == 0);

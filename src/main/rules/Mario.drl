@@ -235,6 +235,7 @@ rule "marioOutOfBounds"
     then
         System.err.println(String.format("Mario is out of bounds: (%f, %f) Death Time: %d, Level width/height: (%d, %d)",
             $mario.getX(), $mario.getY(), $mario.deathTime, $level.width, $level.height));
+        $mario.die();
 end 
 
 
