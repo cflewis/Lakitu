@@ -65,7 +65,22 @@ public class MarioTest extends MarioRulesTest {
 	
 	@Test
 	public void testSetup() {
-		assertTrue(true);
+        assertFalse(Mario.large);
+        assertFalse(Mario.fire);
+        assertTrue(Mario.coins == 0);
+        assertTrue(Mario.lives == 3);        
+	}
+	
+	/**
+	 * This satisfies the "Animation in wrong context" bug
+	 */
+	@Test
+	public void testAnimationSheet() {
+		assertTrue(mario.sheet == Art.smallMario);
+		testMushroom();
+		assertTrue(mario.sheet == Art.mario);
+		testFlower();
+		assertTrue(mario.sheet == Art.fireMario);
 	}
 	
 	@Test 
@@ -127,17 +142,5 @@ public class MarioTest extends MarioRulesTest {
 		assertTrue(Mario.large);
 		tickScene(1);
 		assertTrue(mario.isDucking());
-	}
-	
-	/**
-	 * This satisfies the "Animation in wrong context" bug
-	 */
-	@Test
-	public void testAnimationSheet() {
-		assertTrue(mario.sheet == Art.smallMario);
-		testMushroom();
-		assertTrue(mario.sheet == Art.mario);
-		testFlower();
-		assertTrue(mario.sheet == Art.fireMario);
 	}
 }

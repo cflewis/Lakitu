@@ -77,6 +77,7 @@ public class Mario extends Sprite
         y = 0;
 
         facing = 1;
+        sheet = Art.smallMario;
         setLarge(Mario.large, Mario.fire);
     }
     
