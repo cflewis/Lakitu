@@ -128,6 +128,11 @@ public class MarioTest extends MarioRulesTest {
 	}
 	
 	@Test
+	public void testCoinValue() {
+		//TODO: Implement this
+	}
+	
+	@Test
 	public void testDuck() {
 		Mario.large = false;
 		assertFalse(Mario.large);

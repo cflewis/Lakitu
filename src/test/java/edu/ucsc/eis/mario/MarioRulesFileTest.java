@@ -13,6 +13,14 @@ import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.level.Pit;
 import edu.ucsc.eis.mario.sprites.Mario;
 
+/**
+ * Tests not valid for Infinite Mario:
+ * - Script in invalid state: No script functions
+ * - Invalid damage over time (Mario kills all enemies with one shot)
+ * - Invalid resouce accumulation over time (how many coins can Mario get a second?) 
+ * @author cflewis
+ *
+ */
 public class MarioRulesFileTest extends MarioRulesTest {
 	@Test
 	public void testSceneDetection() {
@@ -20,67 +28,6 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		assertFired("levelSceneFound");
 		assertFired("levelFound");
 		assertFired("pitFound");
-	}
-	
-	@Test
-	public void testPitDetection() {
-		// Create a pit by hand
-		for (int x = 20; x < 30; x++) {
-			for (int y = 0; y < scene.getLevel().height; y++) {
-				scene.level.setBlock(x, y, (byte) 0);
-			}
-		}
-		
-		scene.level.pits = new ArrayList<Pit>();
-		scene.level.pits.add(new Pit(20, 29, false));
-		
-		ksession.insert(scene);
-		assertFired("pitFound");
-		assertFired("pitTooLong");
-		assertFalse(scene.level.getBlock(29, scene.level.height - 1) == (byte) 0);
-	}
-	
-	
-	@Test
-	public void brokenJump() {
-		mario.setJumpTime(50);
-		assertTrue("Mario jump time was " + mario.getJumpTime(),
-				mario.getJumpTime() == 50);
-		tickScene(1);
-		// Rule engine should now kick in and stop the silly value
-		assertFired("marioTooHigh");
-		tickScene(1);
-		assertTrue(mario.getJumpTime() <= 0);
-		// Y is counted top to bottom, so higher Y is lower on screen
-		assertTrue(mario.getYJumpSpeed() >= 0);
-	}
-	
-	@Test
-	public void eventJump() {
-		FactHandle jumpEvent = ksession.insert(new Jump(mario));
-		tickScene(1);
-		assertFired("jumpEventFound");
-		
-		FactHandle landingEvent = ksession.insert(new Landing(mario));
-		tickScene(1);
-		
-		assertNotFired("marioJumpTooLong");
-		// When Mario lands, we can retract this fact to show that he landed
-		ksession.retract(jumpEvent);
-		ksession.retract(landingEvent);
-	}
-	
-	@Test
-	public void brokenEventJump() {
-		FactHandle jumpEvent = ksession.insert(new Jump(mario));
-		// Cause Mario to be able to jump for *ages*
-		for (int i = 0; i < 100; i++) {
-			mario.setJumpTime(7);
-			tickScene(1);
-		}
-
-		assertFired("marioJumpTooLong");
-		ksession.retract(jumpEvent);
 	}
 	
 	@Test
@@ -101,7 +48,108 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		assertFired("marioIsDucking");
 	}
 	
+	// Simple Test for Required Action Not Possible
+	@Test
+	public void testPitDetection() {
+		// Create a pit by hand
+		for (int x = 20; x < 30; x++) {
+			for (int y = 0; y < scene.getLevel().height; y++) {
+				scene.level.setBlock(x, y, (byte) 0);
+			}
+		}
+		
+		scene.level.pits = new ArrayList<Pit>();
+		scene.level.pits.add(new Pit(20, 29, false));
+		
+		ksession.insert(scene);
+		assertFired("pitFound");
+		assertFired("pitTooLong");
+		assertFalse(scene.level.getBlock(29, scene.level.height - 1) == (byte) 0);
+	}
 	
+	/**
+	 * Test for invalid position over time: Mario can't jump that high from
+	 * the ground, but of course he could be that high position-wise.
+	 * 
+	 * Does this count if I'm not doing a position check?
+	 */
+	@Test
+	public void testBrokenJump() {
+		mario.setJumpTime(50);
+		assertTrue("Mario jump time was " + mario.getJumpTime(),
+				mario.getJumpTime() == 50);
+		tickScene(1);
+		// Rule engine should now kick in and stop the silly value
+		assertFired("marioTooHigh");
+		tickScene(1);
+		assertTrue(mario.getJumpTime() <= 0);
+		// Y is counted top to bottom, so higher Y is lower on screen
+		assertTrue(mario.getYJumpSpeed() >= 0);
+	}
+	
+	@Test
+	public void testEscapeYBoundary() {
+		ksession.insert(scene);
+		mario.y = -21;
+		assertTrue(mario.getY() == -21);
+		assertTrue(mario.deathTime == 0);
+		assertFired("marioOutOfBounds");
+	}
+	
+	@Test
+	public void testEscapeYBoundaryWithDeath() {
+		ksession.insert(scene);
+		mario.die();
+		mario.y = (scene.level.height * 16) + 21;
+		tickScene(1);
+		assertFalse(mario.deathTime == 0);
+		// This shouldn't fire if Mario is set to be dead
+		assertNotFired("marioOutOfBounds");
+	}
+	
+	@Test
+	public void testEscapeXBoundary() {
+		ksession.insert(scene);
+		mario.x = -21;
+		assertTrue(mario.getX() == -21);
+		assertTrue(mario.deathTime == 0);
+		assertFired("marioOutOfBounds");
+		mario.x = (scene.level.height * 16) + 1;
+		assertTrue(mario.getX() == (scene.level.height * 16) + 1);
+		assertTrue(mario.deathTime == 0);
+		assertFired("marioOutOfBounds");
+	}
+	
+	@Test
+	public void testEventJump() {
+		FactHandle jumpEvent = ksession.insert(new Jump(mario));
+		tickScene(1);
+		assertFired("jumpEventFound");
+		
+		FactHandle landingEvent = ksession.insert(new Landing(mario));
+		tickScene(1);
+		
+		assertNotFired("marioJumpTooLong");
+		// When Mario lands, we can retract this fact to show that he landed
+		ksession.retract(jumpEvent);
+		ksession.retract(landingEvent);
+	}
+	
+	// Test for invalid position over time: Mario can't jump too long
+	@Test
+	public void testBrokenEventJump() {
+		FactHandle jumpEvent = ksession.insert(new Jump(mario));
+		// Cause Mario to be able to jump for *ages*
+		for (int i = 0; i < 100; i++) {
+			mario.setJumpTime(7);
+			tickScene(1);
+		}
+
+		assertFired("marioJumpTooLong");
+		ksession.retract(jumpEvent);
+	}
+	
+	// Tests for invalid animation context
 	@Test
 	public void testBrokenSmallAnimationSheet() {
 		Mario.large = false;
@@ -137,7 +185,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 
 	
 	/**
-	 * This satisfies the "Action when not allowed" bug.
+	 * Test for "Action when not allowed" bug.
 	 * As this kills Mario, this should either be tested at the end,
 	 * or I have to work out why the Mario instance variable
 	 * isn't being set to the new Mario that is created once this one
