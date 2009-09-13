@@ -45,6 +45,11 @@ public class MarioRulesTest {
 	protected Mario mario;
 	protected StatefulKnowledgeSession ksession;
 	protected TrackingAgendaEventListener trackingAgendaEventListener;
+	protected boolean rulesEnabled;
+	
+	public MarioRulesTest() {
+		rulesEnabled = true;
+	}
 	
 	@Before
 	public void setUp() throws IOException {
@@ -103,8 +108,12 @@ public class MarioRulesTest {
 	protected void tickScene(int ticks) {
 		for (int i = 0; i < ticks; i++) {
 			FactHandle marioFact = ksession.insert(mario);
-			ksession.startProcess("Mario");
-			ksession.fireAllRules();
+
+			if (rulesEnabled) {
+				ksession.startProcess("Mario");
+				ksession.fireAllRules();
+			}
+			
 			scene.tick();
 			SessionPseudoClock clock = ksession.getSessionClock();
 			clock.advanceTime(42, TimeUnit.MILLISECONDS);
