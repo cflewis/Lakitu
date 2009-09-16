@@ -59,7 +59,6 @@ import static org.mockito.Mockito.*;
  */
 public class MarioTest extends MarioRulesTest {
 	public MarioTest() {
-		super();
 		rulesEnabled = false;
 	}
 	
