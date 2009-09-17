@@ -95,6 +95,7 @@ public class MarioRulesTest {
 			System.exit(1);
 		}
 		
+		mario.keys[Mario.KEY_JUMP] = false;
 		tickScene(500);
 		assertTrue(mario.deathTime == 0);
 		assertTrue(mario.getJumpTime() == 0);

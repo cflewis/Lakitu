@@ -189,12 +189,28 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	
 	// Test for invalid event occurance over time
 	// This one uses events (jumping without landing)...
-	public void testDoubleJump() {
+	@Test
+	public void testValidDoubleJump() {
 		// Mario can't double jump ie. jump without landing
-		mario.keys[Mario.KEY_JUMP] = true;
-		tickScene(1);
-		assertTrue(mario.getJumpTime() > 0);
-		
+		ksession.insert(new Jump(mario));
+		tickScene(5);
+		mario.setJumpTime(5);
+		mario.setSliding(true);
+		ksession.insert(new Jump(mario));
+		assertNotFired("marioDoubleJump");
+	}
+	
+	@Test
+	public void testBrokenDoubleJump() {
+		// Mario can't double jump ie. jump without landing
+		System.out.println("==Testing broken double jump");
+		ksession.insert(new Jump(mario));
+		tickScene(5);
+		mario.setJumpTime(5);
+		mario.setSliding(false);
+		ksession.insert(new Jump(mario));
+		System.out.println("==Ending broken double jump");
+		assertFired("marioDoubleJump");
 	}
 	
 	// Test for invalid event occurance over time

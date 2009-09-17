@@ -130,14 +130,12 @@ public class MarioTest extends MarioRulesTest {
 	public void testDoubleJump() {
 		// Mario can't double jump ie. jump without landing
 		mario.keys[Mario.KEY_JUMP] = true;
-		tickScene(4);
+		tickScene(5);
 		assertTrue(mario.getJumpTime() > 0);
 		mario.keys[Mario.KEY_JUMP] = false;
-		int lastJumpTime = 0;
 		
 		while(mario.getJumpTime() > 3) {
 			tickScene(1);
-			lastJumpTime = mario.getJumpTime();
 		}
 		
 		tickScene(1);
