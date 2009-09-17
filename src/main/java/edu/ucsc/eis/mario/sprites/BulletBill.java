@@ -51,7 +51,7 @@ public class BulletBill extends Sprite
         {
             if (yMarioD > -height && yMarioD < world.mario.height)
             {
-                if (world.mario.ya > 0 && yMarioD <= 0 && (!world.mario.isOnGround() || !world.mario.wasOnGround))
+                if (world.mario.ya > 0 && yMarioD <= 0 && (!world.mario.onGround || !world.mario.wasOnGround))
                 {
                     world.mario.stomp(this);
                     dead = true;
