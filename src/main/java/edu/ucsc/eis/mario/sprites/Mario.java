@@ -772,4 +772,8 @@ public class Mario extends Sprite
 	public static boolean isFire() {
 		return fire;
 	}
+
+	public boolean isOnGround() {
+		return onGround;
+	}
 }

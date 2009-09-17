@@ -95,7 +95,10 @@ public class MarioRulesTest {
 			System.exit(1);
 		}
 		
-		tickScene(100);
+		tickScene(500);
+		assertTrue(mario.deathTime == 0);
+		assertTrue(mario.getJumpTime() == 0);
+		assertTrue(mario.isOnGround());
 	}
 	
 	@After

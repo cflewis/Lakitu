@@ -118,12 +118,33 @@ public class MarioTest extends MarioRulesTest {
 	@Test
 	public void testJump() {
 		mario.keys[Mario.KEY_JUMP] = true;
-		tickScene(1);
+		tickScene(4);
 		assertTrue(mario.getJumpTime() > 0);
 		tickScene(2);
 		assertTrue(mario.getJumpTime() > 0);
 		tickScene(22);
 		assertTrue(mario.getJumpTime() <= 0);
+	}
+	
+	@Test
+	public void testDoubleJump() {
+		// Mario can't double jump ie. jump without landing
+		mario.keys[Mario.KEY_JUMP] = true;
+		tickScene(4);
+		assertTrue(mario.getJumpTime() > 0);
+		mario.keys[Mario.KEY_JUMP] = false;
+		int lastJumpTime = 0;
+		
+		while(mario.getJumpTime() > 3) {
+			tickScene(1);
+			lastJumpTime = mario.getJumpTime();
+		}
+		
+		tickScene(1);
+		mario.keys[Mario.KEY_JUMP] = true;
+		tickScene(4);
+		assertTrue(mario.getJumpTime() < 3);
+		mario.keys[Mario.KEY_JUMP] = false;
 	}
 	
 	@Test

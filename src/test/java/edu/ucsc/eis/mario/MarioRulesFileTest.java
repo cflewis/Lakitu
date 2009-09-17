@@ -87,6 +87,9 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		assertTrue(mario.getYJumpSpeed() >= 0);
 	}
 	
+	/**
+	 * Test for position invalid
+	 */
 	@Test
 	public void testEscapeYBoundary() {
 		ksession.insert(scene);
@@ -183,7 +186,28 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		assertFired("marioAnimationFire");
 		assertTrue(mario.sheet == Art.fireMario);
 	}
+	
+	// Test for invalid event occurance over time
+	// This one uses events (jumping without landing)...
+	public void testDoubleJump() {
+		// Mario can't double jump ie. jump without landing
+		mario.keys[Mario.KEY_JUMP] = true;
+		tickScene(1);
+		assertTrue(mario.getJumpTime() > 0);
+		
+	}
+	
+	// Test for invalid event occurance over time
+	// ...this one is purely temporal
+	public void testBulletBillFiring() {
+		
+	}
 
+	// Invalid value change
+	@Test
+	public void testCoinValue() {
+		//TODO: Implement this
+	}
 	
 	/**
 	 * Test for "Action when not allowed" bug.
