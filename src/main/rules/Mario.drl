@@ -26,7 +26,7 @@ end
 declare BulletBillSpawn
     @role(event)
     @timestamp(spawnTime)
-    @expires(15s)
+    @expires(3s)
 end
 
 # Test rules to make sure facts are inserted
@@ -271,7 +271,7 @@ rule "bulletBillSpawn"
     ruleflow-group "Integrity"
     when
         BulletBillSpawn($cannonId : cannonId)
-        $list : ArrayList(size > 1) from collect(BulletBillSpawn(cannonId == $cannonId) over window:time(10s))
+        $list : ArrayList(size > 1) from collect(BulletBillSpawn(cannonId == $cannonId) over window:time(3s))
     then
         BulletBillSpawn newestBillSpawn = (BulletBillSpawn) Collections.max($list);
         LevelScene levelScene = newestBillSpawn.getBulletBill().getWorld();

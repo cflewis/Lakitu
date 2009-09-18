@@ -354,8 +354,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     public static long getClockTime() {
     	long time = System.currentTimeMillis();
     	if (ksession != null) {
-    		SessionPseudoClock clock = ksession.getSessionClock();
-    		time = clock.getCurrentTime();
+    		time = ksession.getSessionClock().getCurrentTime();
     	}
     	
     	return time;
