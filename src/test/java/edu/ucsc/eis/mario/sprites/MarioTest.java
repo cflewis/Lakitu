@@ -147,7 +147,9 @@ public class MarioTest extends MarioRulesTest {
 	
 	@Test
 	public void testCoinValue() {
-		//TODO: Implement this
+		int oldCoin = Mario.coins;
+		Mario.getCoin();
+		assertTrue(oldCoin + 1 == Mario.coins);
 	}
 	
 	@Test

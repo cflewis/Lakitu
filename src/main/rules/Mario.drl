@@ -79,6 +79,14 @@ rule "billSpawnEventFound"
         System.err.println("Found a Bullet Bill: " + $bill);
 end
 
+rule "valueChangeFound"
+    ruleflow-group "Test"
+    when
+        $change : ValueChange()
+    then
+        System.err.println("Found a value change: " + $change);
+end
+
 rule "marioFound"
     ruleflow-group "Test"
     when
@@ -278,6 +286,15 @@ rule "bulletBillSpawn"
         levelScene.removeSprite(newestBillSpawn.getBulletBill());
         retract(newestBillSpawn);
         System.err.println("Bullet bills firing too fast, retracted " + newestBillSpawn);
+end
+
+rule "coinValue"
+    ruleflow-group "Integrity"
+    when
+        $change : ValueChange(changeType == ValueChange.COIN_CHANGE, eval((startValue + 1) != endValue))
+    then
+        Mario.coins = $change.getStartValue() + 1;
+        retract($change);
 end
 
  

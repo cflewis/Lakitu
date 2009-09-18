@@ -19,6 +19,7 @@ import org.junit.Test;
 import edu.ucsc.eis.mario.events.BulletBillSpawn;
 import edu.ucsc.eis.mario.events.Jump;
 import edu.ucsc.eis.mario.events.Landing;
+import edu.ucsc.eis.mario.events.ValueChange;
 import edu.ucsc.eis.mario.level.Pit;
 import edu.ucsc.eis.mario.sprites.BulletBill;
 import edu.ucsc.eis.mario.sprites.Mario;
@@ -249,7 +250,11 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	// Invalid value change
 	@Test
 	public void testCoinValue() {
-		//TODO: Implement this
+		int oldCoin = Mario.coins;
+		Mario.coins = Mario.coins + 2;
+		ksession.insert(new ValueChange(mario, ValueChange.COIN_CHANGE, 
+				oldCoin, Mario.coins));
+		assertFired("coinValue");
 	}
 	
 	/**
