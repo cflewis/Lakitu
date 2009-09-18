@@ -22,6 +22,11 @@ declare Landing
     @expires(1s)
 end
 
+declare BulletBillSpawn
+    @role(event)
+    @expires(15s)
+end
+
 # Test rules to make sure facts are inserted
 rule "jumpEventFound"
     ruleflow-group "Test"
@@ -249,6 +254,16 @@ rule "marioDoubleJump"
         $mario.setYJumpSpeed(0);
         retract($jump2);
         System.err.println("Mario double jumped");
+end
+
+// Find all Bullet Bills spawned from the same cannon in the last 10 seconds
+rule "bulletBillSpawn"
+    ruleflow-group "Integrity"
+    when
+        BulletBillSpawn($cannonId : cannonId)
+        $list : ArrayList(size > 1) from collect(BulletBillSpawn(cannonId == $cannonId) over window:time(10s))
+    then
+        System.err.println("Bullet bills firing too fast: " + $list);
 end
 
  

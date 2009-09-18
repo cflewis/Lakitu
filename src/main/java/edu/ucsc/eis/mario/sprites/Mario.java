@@ -776,4 +776,12 @@ public class Mario extends Sprite
 	public boolean isOnGround() {
 		return onGround;
 	}
+
+	public boolean isSliding() {
+		return sliding;
+	}
+
+	public void setSliding(boolean sliding) {
+		this.sliding = sliding;
+	}
 }

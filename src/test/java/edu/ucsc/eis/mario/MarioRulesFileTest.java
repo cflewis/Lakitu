@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.drools.runtime.rule.FactHandle;
 import org.junit.Test;
 
+import edu.ucsc.eis.mario.events.BulletBillSpawn;
 import edu.ucsc.eis.mario.events.Jump;
 import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.level.Pit;
@@ -203,20 +204,33 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	@Test
 	public void testBrokenDoubleJump() {
 		// Mario can't double jump ie. jump without landing
-		System.out.println("==Testing broken double jump");
 		ksession.insert(new Jump(mario));
 		tickScene(5);
 		mario.setJumpTime(5);
 		mario.setSliding(false);
 		ksession.insert(new Jump(mario));
-		System.out.println("==Ending broken double jump");
 		assertFired("marioDoubleJump");
 	}
 	
 	// Test for invalid event occurance over time
 	// ...this one is purely temporal
+	@Test
 	public void testBulletBillFiring() {
-		
+		ksession.insert(new BulletBillSpawn(1));
+		tickScene(1000);
+		ksession.insert(new BulletBillSpawn(1));
+		assertNotFired("bulletBillSpawn");
+		ksession.insert(new BulletBillSpawn(2));
+		ksession.insert(new BulletBillSpawn(3));
+		assertNotFired("bulletBillSpawn");
+	}
+	
+	@Test
+	public void testBrokenBulletBillFiring() {
+		ksession.insert(new BulletBillSpawn(1));
+		tickScene(10);
+		ksession.insert(new BulletBillSpawn(1));
+		assertFired("bulletBillSpawn");
 	}
 
 	// Invalid value change
