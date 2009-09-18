@@ -145,5 +145,9 @@ public class BulletBill extends Sprite
             }
         }
         return false;
-    }      
+    }
+
+	public LevelScene getWorld() {
+		return world;
+	}      
 }

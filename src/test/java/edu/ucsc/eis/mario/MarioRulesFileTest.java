@@ -3,6 +3,14 @@ package edu.ucsc.eis.mario;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyFloat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 
 import org.drools.runtime.rule.FactHandle;
@@ -12,6 +20,7 @@ import edu.ucsc.eis.mario.events.BulletBillSpawn;
 import edu.ucsc.eis.mario.events.Jump;
 import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.level.Pit;
+import edu.ucsc.eis.mario.sprites.BulletBill;
 import edu.ucsc.eis.mario.sprites.Mario;
 
 /**
@@ -216,20 +225,24 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	// ...this one is purely temporal
 	@Test
 	public void testBulletBillFiring() {
-		ksession.insert(new BulletBillSpawn(1));
+		BulletBill bill = mock(BulletBill.class);
+		when(bill.getWorld()).thenReturn(scene);
+		ksession.insert(new BulletBillSpawn(bill, 1, getClockTime()));
 		tickScene(1000);
-		ksession.insert(new BulletBillSpawn(1));
+		ksession.insert(new BulletBillSpawn(bill, 1, getClockTime()));
 		assertNotFired("bulletBillSpawn");
-		ksession.insert(new BulletBillSpawn(2));
-		ksession.insert(new BulletBillSpawn(3));
+		ksession.insert(new BulletBillSpawn(bill, 2, getClockTime()));
+		ksession.insert(new BulletBillSpawn(bill, 3, getClockTime()));
 		assertNotFired("bulletBillSpawn");
 	}
 	
 	@Test
 	public void testBrokenBulletBillFiring() {
-		ksession.insert(new BulletBillSpawn(1));
+		BulletBill bill = mock(BulletBill.class);
+		when(bill.getWorld()).thenReturn(scene);
+		ksession.insert(new BulletBillSpawn(bill, 1, getClockTime()));
 		tickScene(10);
-		ksession.insert(new BulletBillSpawn(1));
+		ksession.insert(new BulletBillSpawn(bill, 1, getClockTime()));
 		assertFired("bulletBillSpawn");
 	}
 

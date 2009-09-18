@@ -13,12 +13,12 @@ import org.drools.io.ResourceFactory;
 
 import com.google.common.base.Preconditions;
 
-public class KnowledgeReader {
-	public static KnowledgeBase getKnowledgeBase(String ruleResource) {
-		return getKnowledgeBase(ruleResource, null);
+public class KnowledgeFactory {
+	public static KnowledgeBase newKnowledgeBase(String ruleResource) {
+		return newKnowledgeBase(ruleResource, null);
 	}
 	
-	public static KnowledgeBase getKnowledgeBase(String ruleResource, 
+	public static KnowledgeBase newKnowledgeBase(String ruleResource, 
 			String ruleFlowResource) 
 		throws IllegalArgumentException {
 		Preconditions.checkNotNull(ruleResource, "Must pass a resource");

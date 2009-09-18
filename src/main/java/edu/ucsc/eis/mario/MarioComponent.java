@@ -237,7 +237,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private void initKnowledgeSession() {
 		try {
 			// load up the knowledge base
-			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl", "Mario.rf");
+			KnowledgeBase kbase = KnowledgeFactory.newKnowledgeBase("Mario.drl", "Mario.rf");
 			ksession = kbase.newStatefulKnowledgeSession();
 			//KnowledgeRuntimeLogger knowledgeLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
@@ -349,5 +349,15 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     	if (ksession != null) {
     		ksession.insert(fact);
     	}
+    }
+    
+    public static long getClockTime() {
+    	long time = System.currentTimeMillis();
+    	if (ksession != null) {
+    		SessionPseudoClock clock = ksession.getSessionClock();
+    		time = clock.getCurrentTime();
+    	}
+    	
+    	return time;
     }
 }

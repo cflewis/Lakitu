@@ -84,13 +84,14 @@ public class MarioRulesTest {
 		
 		try {
 			// load up the knowledge base
-			KnowledgeBase kbase = KnowledgeReader.getKnowledgeBase("Mario.drl", "Mario.rf");
+			KnowledgeBase kbase = KnowledgeFactory.newKnowledgeBase("Mario.drl", "Mario.rf");
 			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
 			config.setOption(ClockTypeOption.get("pseudo"));
 			ksession = kbase.newStatefulKnowledgeSession(config, null);
 			//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			trackingAgendaEventListener = new TrackingAgendaEventListener();
 			ksession.addEventListener(trackingAgendaEventListener);
+			MarioComponent.ksession = ksession;
 		} catch (Throwable t) {
 			t.printStackTrace();
 			System.exit(1);
@@ -124,6 +125,17 @@ public class MarioRulesTest {
 			clock.advanceTime(42, TimeUnit.MILLISECONDS);
 			ksession.retract(marioFact);
 		}
+	}
+	
+	protected long getClockTime() {
+    	long time = System.currentTimeMillis();
+    	if (ksession != null) {
+    		SessionPseudoClock clock = ksession.getSessionClock();
+    		time = clock.getCurrentTime();
+    	}
+    	
+    	System.out.println("Time is " + time);
+    	return time;
 	}
 	
 	protected void assertFired(String ruleName) {

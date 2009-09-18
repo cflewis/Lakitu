@@ -1,5 +1,6 @@
 package edu.ucsc.eis.mario.events;
 
+import edu.ucsc.eis.mario.LevelScene;
 import edu.ucsc.eis.mario.sprites.Mario;
 
 public class MarioEvent {
@@ -11,5 +12,9 @@ public class MarioEvent {
 	
 	public Mario getMario() {
 		return this.mario;
+	}
+	
+	public LevelScene getLevelScene() {
+		return this.mario.getWorld();
 	}
 }

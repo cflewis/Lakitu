@@ -2,11 +2,12 @@
 package edu.ucsc.eis.mario
 
 #list any import classes here.
-import edu.ucsc.eis.mario.sprites.Mario
+import edu.ucsc.eis.mario.sprites.*
 import edu.ucsc.eis.mario.events.* 
 import edu.ucsc.eis.mario.level.Pit
 import java.util.ArrayList
 import java.util.Iterator
+import java.util.Collections
 import function org.mockito.Mockito.* 
 
 
@@ -24,6 +25,7 @@ end
 
 declare BulletBillSpawn
     @role(event)
+    @timestamp(spawnTime)
     @expires(15s)
 end
 
@@ -67,6 +69,14 @@ rule "pitFound"
         $pit : Pit() from $level.pits
     then
         System.err.println("Found a pit: " + $pit);
+end
+
+rule "billSpawnEventFound"
+    ruleflow-group "Test"
+    when
+        $bill : BulletBillSpawn()
+    then
+        System.err.println("Found a Bullet Bill: " + $bill);
 end
 
 rule "marioFound"
@@ -263,7 +273,11 @@ rule "bulletBillSpawn"
         BulletBillSpawn($cannonId : cannonId)
         $list : ArrayList(size > 1) from collect(BulletBillSpawn(cannonId == $cannonId) over window:time(10s))
     then
-        System.err.println("Bullet bills firing too fast: " + $list);
+        BulletBillSpawn newestBillSpawn = (BulletBillSpawn) Collections.max($list);
+        LevelScene levelScene = newestBillSpawn.getBulletBill().getWorld();
+        levelScene.removeSprite(newestBillSpawn.getBulletBill());
+        retract(newestBillSpawn);
+        System.err.println("Bullet bills firing too fast, retracted " + newestBillSpawn);
 end
 
  
