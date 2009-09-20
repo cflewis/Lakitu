@@ -6,10 +6,15 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import edu.ucsc.eis.mario.level.LevelGenerator;
+import edu.ucsc.eis.mario.sprites.BulletBill;
+
 public class MarioRulesFrameLauncher implements ActionListener
 {
 	JRadioButtonMenuItem rulesEnabledMenuItem;
 	JRadioButtonMenuItem rulesDisabledMenuItem;
+	JRadioButtonMenuItem goodMenuItem;
+	JRadioButtonMenuItem badMenuItem;
 	
 	public MarioRulesFrameLauncher() {
     	JMenuBar menuBar = new JMenuBar();
@@ -19,12 +24,14 @@ public class MarioRulesFrameLauncher implements ActionListener
     	menuBar.add(rulesMenu);
     	
     	ButtonGroup group = new ButtonGroup();
-    	JRadioButtonMenuItem goodMenuItem = new JRadioButtonMenuItem("Good Code");
+    	goodMenuItem = new JRadioButtonMenuItem("Good Code");
     	goodMenuItem.setSelected(true);
+    	goodMenuItem.addActionListener(this);
     	group.add(goodMenuItem);
     	versionMenu.add(goodMenuItem);
 
-    	JRadioButtonMenuItem badMenuItem = new JRadioButtonMenuItem("Bugged Code");
+    	badMenuItem = new JRadioButtonMenuItem("Bugged Code");
+    	badMenuItem.addActionListener(this);
     	group.add(badMenuItem);
     	versionMenu.add(badMenuItem);
     	
@@ -71,7 +78,18 @@ public class MarioRulesFrameLauncher implements ActionListener
 		if (source == rulesDisabledMenuItem) {
 			MarioComponent.rulesEnabled = false;
 			System.err.println("ruled disabled");
-
+		}
+		
+		if (source == badMenuItem) {
+			BulletBill.FREQUENCY = 50;
+			LevelGenerator.JUMP_LENGTH = 16;
+			System.err.println("Bad code enabled");
+		}
+		
+		if (source == goodMenuItem) {
+			BulletBill.FREQUENCY = 100;
+			LevelGenerator.JUMP_LENGTH = 2;
+			System.err.println("Good code enabled");
 		}
 	}
 	

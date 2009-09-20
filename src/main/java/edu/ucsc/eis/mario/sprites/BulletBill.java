@@ -18,6 +18,7 @@ public class BulletBill extends Sprite
 
     public boolean dead = false;
     private int deadTime = 0;
+    public static int FREQUENCY = 100;
 
 
     public BulletBill(LevelScene world, float x, float y, int dir)
@@ -149,5 +150,5 @@ public class BulletBill extends Sprite
 
 	public LevelScene getWorld() {
 		return world;
-	}      
+	}  
 }

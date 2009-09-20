@@ -35,6 +35,7 @@ public class LevelGenerator
     private int totalOdds;
     private int difficulty;
     private int type;
+    public static int JUMP_LENGTH = 2;
 
     private LevelGenerator(int width, int height)
     {
@@ -148,7 +149,7 @@ public class LevelGenerator
     private int buildJump(int xo, int maxLength)
     {
         int js = random.nextInt(4) + 2;
-    	int jl = random.nextInt(2) + 2;
+    	int jl = random.nextInt(2) + JUMP_LENGTH;
         int length = js * 2 + jl;
 
         boolean hasStairs = random.nextInt(3) == 0;

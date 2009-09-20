@@ -238,7 +238,7 @@ public class LevelScene extends Scene implements SpriteContext
                         {
                             if ((b % 16) / 4 == 3 && b / 16 == 0)
                             {
-                                if ((tick - x * 2) % 100 == 0)
+                                if ((tick - x * 2) % BulletBill.FREQUENCY == 0)
                                 {
                                     xCannon = x;
                                     for (int i = 0; i < 8; i++)
