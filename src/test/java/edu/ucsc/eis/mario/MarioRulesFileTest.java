@@ -104,7 +104,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	@Test
 	public void testEscapeYBoundary() {
 		ksession.insert(scene);
-		mario.y = -21;
+		mario.y = -71;
 		assertTrue(mario.getY() == -71);
 		assertTrue(mario.deathTime == 0);
 		assertFired("marioOutOfBounds");
