@@ -238,7 +238,7 @@ public class LevelScene extends Scene implements SpriteContext
                         {
                             if ((b % 16) / 4 == 3 && b / 16 == 0)
                             {
-                                if ((tick - x * 2) % BulletBill.FREQUENCY == 0)
+                                if ((tick - x * 2) % BulletBill.frequency == 0)
                                 {
                                     xCannon = x;
                                     for (int i = 0; i < 8; i++)
@@ -516,7 +516,7 @@ public class LevelScene extends Scene implements SpriteContext
             }
             else
             {
-                Mario.getCoin();
+                mario.getCoin();
                 sound.play(Art.samples[Art.SAMPLE_GET_COIN], new FixedSoundSource(x * 16 + 8, y * 16 + 8), 1, 1, 1);
                 addSprite(new CoinAnim(x, y));
             }
@@ -545,7 +545,7 @@ public class LevelScene extends Scene implements SpriteContext
         byte block = level.getBlock(x, y);
         if (((Level.TILE_BEHAVIORS[block & 0xff]) & Level.BIT_PICKUPABLE) > 0)
         {
-            Mario.getCoin();
+            mario.getCoin();
             sound.play(Art.samples[Art.SAMPLE_GET_COIN], new FixedSoundSource(x * 16 + 8, y * 16 + 8), 1, 1, 1);
             level.setBlock(x, y, (byte) 0);
             addSprite(new CoinAnim(x, y + 1));

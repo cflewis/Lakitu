@@ -9,6 +9,7 @@ import edu.ucsc.eis.mario.MarioComponent;
 import edu.ucsc.eis.mario.Scene;
 import edu.ucsc.eis.mario.events.Jump;
 import edu.ucsc.eis.mario.events.Landing;
+import edu.ucsc.eis.mario.events.ValueChange;
 import edu.ucsc.eis.mario.level.*;
 
 
@@ -19,6 +20,10 @@ public class Mario extends Sprite
     public static int coins = 0;
     public static int lives = 3;
     public static String levelString = "none";
+    public static int maxJumpTime = 7;
+    public static boolean dieOnFall = true;
+    public static boolean stopMovementOnDeath = true;
+    public static int coinValue = 1;
 
     public static void resetStatic()
     {
@@ -158,7 +163,8 @@ public class Mario extends Sprite
             }
             x += xa;
             y += ya;
-            return;
+            
+            if (stopMovementOnDeath) { return; }
         }
 
         if (powerUpTime != 0)
@@ -224,7 +230,7 @@ public class Mario extends Sprite
                 world.sound.play(Art.samples[Art.SAMPLE_MARIO_JUMP], this, 1, 1, 1);
                 xJumpSpeed = 0;
                 yJumpSpeed = -1.9f;
-                jumpTime = 7;
+                jumpTime = maxJumpTime;
                 ya = jumpTime * yJumpSpeed;
                 onGround = false;
                 sliding = false;
@@ -307,7 +313,7 @@ public class Mario extends Sprite
         move(xa, 0);
         move(0, ya);
 
-        if (y > world.level.height * 16 + 16)
+        if (y > world.level.height * 16 + 16 && dieOnFall)
         {
             die();
         }
@@ -515,7 +521,7 @@ public class Mario extends Sprite
 
         if (((Level.TILE_BEHAVIORS[block & 0xff]) & Level.BIT_PICKUPABLE) > 0)
         {
-            Mario.getCoin();
+            this.getCoin();
             world.sound.play(Art.samples[Art.SAMPLE_GET_COIN], new FixedSoundSource(x * 16 + 8, y * 16 + 8), 1, 1, 1);
             world.level.setBlock(x, y, (byte) 0);
             for (int xx = 0; xx < 2; xx++)
@@ -633,7 +639,7 @@ public class Mario extends Sprite
         }
         else
         {
-            Mario.getCoin();
+            this.getCoin();
             world.sound.play(Art.samples[Art.SAMPLE_GET_COIN], this, 1, 1, 1);
         }
     }
@@ -651,7 +657,7 @@ public class Mario extends Sprite
         }
         else
         {
-            Mario.getCoin();
+            this.getCoin();
             world.sound.play(Art.samples[Art.SAMPLE_GET_COIN], this, 1, 1, 1);
         }
     }
@@ -717,9 +723,13 @@ public class Mario extends Sprite
         }
     }
     
-    public static void getCoin()
+    public void getCoin()
     {
-        coins++;
+    	int oldCoin = coins;
+        coins = coins + coinValue;
+        
+        MarioComponent.insertFact(new ValueChange(this, ValueChange.COIN_CHANGE, 
+				oldCoin, coins));
         if (coins==100)
         {
             coins = 0;

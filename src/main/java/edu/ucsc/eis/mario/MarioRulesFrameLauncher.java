@@ -6,8 +6,11 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import com.google.common.base.Preconditions;
+
 import edu.ucsc.eis.mario.level.LevelGenerator;
 import edu.ucsc.eis.mario.sprites.BulletBill;
+import edu.ucsc.eis.mario.sprites.Mario;
 
 public class MarioRulesFrameLauncher implements ActionListener
 {
@@ -16,6 +19,8 @@ public class MarioRulesFrameLauncher implements ActionListener
 	JRadioButtonMenuItem goodMenuItem;
 	JRadioButtonMenuItem badMenuItem;
 	
+	Mario mario;
+		
 	public MarioRulesFrameLauncher() {
     	JMenuBar menuBar = new JMenuBar();
     	JMenu versionMenu = new JMenu("Version");
@@ -47,9 +52,9 @@ public class MarioRulesFrameLauncher implements ActionListener
     	group1.add(rulesDisabledMenuItem);
     	rulesMenu.add(rulesDisabledMenuItem);
 
-        MarioComponent mario = new MarioComponent(640, 500);
+        MarioComponent marioComponent = new MarioComponent(640, 500, this);
         JFrame frame = new JFrame("Mario Test");
-        frame.setContentPane(mario);
+        frame.setContentPane(marioComponent);
         frame.pack();
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -60,12 +65,14 @@ public class MarioRulesFrameLauncher implements ActionListener
         frame.setJMenuBar(menuBar);
         frame.setVisible(true);
         
-        mario.start();
+        marioComponent.start();
 //        frame.addKeyListener(mario);
 //        frame.addFocusListener(mario);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		if (mario == null) { return; }
+		
 		JMenuItem source = (JMenuItem) e.getSource();
 		
 		System.err.println("Hello" + e);
@@ -81,16 +88,29 @@ public class MarioRulesFrameLauncher implements ActionListener
 		}
 		
 		if (source == badMenuItem) {
-			BulletBill.FREQUENCY = 50;
-			LevelGenerator.JUMP_LENGTH = 16;
+			BulletBill.frequency = 50;
+			LevelGenerator.jumpLength = 16;
+			Mario.maxJumpTime = 50;
+			Mario.dieOnFall = false;
+			mario.sheet = Art.fireMario;
+			Mario.stopMovementOnDeath = false;
+			Mario.coinValue = 2;
 			System.err.println("Bad code enabled");
 		}
 		
 		if (source == goodMenuItem) {
-			BulletBill.FREQUENCY = 100;
-			LevelGenerator.JUMP_LENGTH = 2;
+			BulletBill.frequency = 100;
+			LevelGenerator.jumpLength = 2;
+			Mario.maxJumpTime = 7;
+			Mario.dieOnFall = true;
+			Mario.stopMovementOnDeath = true;
+			Mario.coinValue = 1;
 			System.err.println("Good code enabled");
 		}
+	}
+	
+	public void setMario(Mario mario) {
+		this.mario = mario;
 	}
 	
     public static void main(String[] args)

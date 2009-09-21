@@ -254,7 +254,7 @@ rule "marioOutOfBounds"
     ruleflow-group "Integrity"
     when
         LevelScene($level : level)
-        $mario : Mario((x < 0 || x > ($level.width * 16) || y < -20 || y > (($level.height * 16) + 20)), deathTime == 0)
+        $mario : Mario((x < 0 || x > ($level.width * 16) || y < -60 || y > (($level.height * 16) + 20)), deathTime == 0)
     then
         System.err.println(String.format("Mario is out of bounds: (%f, %f) Death Time: %d, Level width/height: (%d, %d)",
             $mario.getX(), $mario.getY(), $mario.deathTime, $level.width, $level.height));

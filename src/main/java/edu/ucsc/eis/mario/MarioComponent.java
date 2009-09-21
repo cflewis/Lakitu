@@ -1,6 +1,7 @@
 package edu.ucsc.eis.mario;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -48,15 +49,21 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     public static StatefulKnowledgeSession ksession;
     FactHandle sceneHandle;
     public static boolean rulesEnabled = true;
+    private MarioRulesFrameLauncher parent;
 
     private Scale2x scale2x = new Scale2x(320, 240);
+    
+    public MarioComponent(int width, int height) {
+    	this(width, height, null);
+    }
 
-    public MarioComponent(int width, int height)
+    public MarioComponent(int width, int height, MarioRulesFrameLauncher parent)
     {
         this.setFocusable(true);
         this.setEnabled(true);
         this.width = width;
         this.height = height;
+        this.parent = parent;
 
         Dimension size = new Dimension(width, height);
         setPreferredSize(size);
@@ -275,12 +282,13 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         LevelScene ls = (LevelScene) scene;
         scene.setSound(sound);
         scene.init();
-        sceneHandle = ksession.insert(ls);
+        if (parent != null) {parent.setMario(ls.mario);}
+        sceneHandle = MarioComponent.insertFact(ls);
     }
 
     public void levelFailed()
     {
-    	ksession.retract(sceneHandle);
+    	if (sceneHandle != null) { ksession.retract(sceneHandle); }
         scene = mapScene;
         mapScene.startMusic();
         Mario.lives--;
@@ -346,10 +354,12 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 //        System.out.println("Delay: " + delay);
     }
     
-    public static void insertFact(Object fact) {
+    public static FactHandle insertFact(Object fact) {
     	if (ksession != null && rulesEnabled) {
-    		ksession.insert(fact);
+    		return ksession.insert(fact);
     	}
+    	
+    	return null;
     }
     
     public static long getClockTime() {
