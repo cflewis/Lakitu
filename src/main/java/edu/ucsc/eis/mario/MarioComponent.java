@@ -115,14 +115,18 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         }
     }
 
-    public void paint(Graphics g)
-    {
-    }
+//    public void paint(Graphics g)
+//    {
+//    }
+//
+//    public void update(Graphics g)
+//    {
+//    }
 
-    public void update(Graphics g)
-    {
+    public void paintComponent(Graphics g) {
+    	super.paintComponent(g);
     }
-
+    
     public void start()
     {
         if (!running)

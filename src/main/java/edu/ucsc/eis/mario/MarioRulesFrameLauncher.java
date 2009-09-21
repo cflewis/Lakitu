@@ -24,7 +24,9 @@ public class MarioRulesFrameLauncher implements ActionListener
 	public MarioRulesFrameLauncher() {
     	JMenuBar menuBar = new JMenuBar();
     	JMenu versionMenu = new JMenu("Version");
+    	versionMenu.getPopupMenu().setLightWeightPopupEnabled(false);
     	JMenu rulesMenu = new JMenu("Rules");
+    	rulesMenu.getPopupMenu().setLightWeightPopupEnabled(false);
     	menuBar.add(versionMenu);
     	menuBar.add(rulesMenu);
     	
