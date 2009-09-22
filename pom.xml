@@ -4,12 +4,15 @@
   <groupId>edu.ucsc.eis.mario</groupId>
   <artifactId>Mario</artifactId>
   <name>Integrity Infinite Mario</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <description>A version of Infinite Mario Bros. with a rules engine enforcing integrity.</description>
 
   <properties>
     <drools.version>5.0.1</drools.version>
   </properties>
+  <scm>
+  	<developerConnection>scm:git:git@github.com:Lewisham/Infinite-Mario-Rules.git</developerConnection>
+  </scm>
 
   <build>
     <resources>
