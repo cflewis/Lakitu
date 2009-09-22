@@ -28,6 +28,8 @@ import org.drools.time.SessionPseudoClock;
 import com.mojang.sonar.FakeSoundEngine;
 import com.mojang.sonar.SonarSoundEngine;
 
+import edu.ucsc.eis.mario.rules.KnowledgeFactory;
+import edu.ucsc.eis.mario.rules.MarioRulesFrameLauncher;
 import edu.ucsc.eis.mario.sprites.*;
 
 

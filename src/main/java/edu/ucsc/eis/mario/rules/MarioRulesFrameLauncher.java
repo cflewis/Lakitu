@@ -1,4 +1,4 @@
-package edu.ucsc.eis.mario;
+package edu.ucsc.eis.mario.rules;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,6 +8,8 @@ import javax.swing.*;
 
 import com.google.common.base.Preconditions;
 
+import edu.ucsc.eis.mario.Art;
+import edu.ucsc.eis.mario.MarioComponent;
 import edu.ucsc.eis.mario.level.LevelGenerator;
 import edu.ucsc.eis.mario.sprites.BulletBill;
 import edu.ucsc.eis.mario.sprites.Mario;
@@ -72,9 +74,7 @@ public class MarioRulesFrameLauncher implements ActionListener
 //        frame.addFocusListener(mario);
 	}
 	
-	public void actionPerformed(ActionEvent e) {
-		if (mario == null) { return; }
-		
+	public void actionPerformed(ActionEvent e) {		
 		JMenuItem source = (JMenuItem) e.getSource();
 		
 		System.err.println("Hello" + e);
@@ -94,9 +94,10 @@ public class MarioRulesFrameLauncher implements ActionListener
 			LevelGenerator.jumpLength = 16;
 			Mario.maxJumpTime = 50;
 			Mario.dieOnFall = false;
-			mario.sheet = Art.fireMario;
 			Mario.stopMovementOnDeath = false;
 			Mario.coinValue = 2;
+			if (mario != null) {mario.sheet = Art.fireMario;}
+
 			System.err.println("Bad code enabled");
 		}
 		

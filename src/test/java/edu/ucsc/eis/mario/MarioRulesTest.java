@@ -38,6 +38,7 @@ import com.mojang.sonar.SoundSource;
 import com.mojang.sonar.sample.SonarSample;
 
 import edu.ucsc.eis.mario.level.LevelGenerator;
+import edu.ucsc.eis.mario.rules.KnowledgeFactory;
 import edu.ucsc.eis.mario.sprites.Mario;
 
 @Ignore

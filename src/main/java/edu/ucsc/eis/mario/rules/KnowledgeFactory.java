@@ -1,4 +1,4 @@
-package edu.ucsc.eis.mario;
+package edu.ucsc.eis.mario.rules;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
