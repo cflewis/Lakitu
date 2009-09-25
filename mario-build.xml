@@ -6,7 +6,7 @@
         <jar destfile="target/mario.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
-                <attribute name="Rsrc-Main-Class" value="edu.ucsc.eis.mario.MarioRulesFrameLauncher"/>
+                <attribute name="Rsrc-Main-Class" value="edu.ucsc.eis.mario.rules.MarioRulesFrameLauncher"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Rsrc-Class-Path" value="./ drools-core-5.0.1.jar mvel2-2.0.10.jar drools-api-5.0.1.jar joda-time-1.6.jar google-collections-1.0-rc2.jar drools-compiler-5.0.1.jar antlr-runtime-3.1.3.jar core-3.4.2.v_883_R34x.jar janino-2.5.15.jar drools-decisiontables-5.0.1.jar drools-templates-5.0.1.jar jxl-2.4.2.jar drools-jsr94-5.0.1.jar jsr94-1.1.jar junit-4.7.jar mockito-all-1.8.0.jar xstream-1.2.2.jar xpp3_min-1.1.3.4.O.jar commons-lang-2.4.jar stringtemplate-3.2.jar antlr-2.7.7.jar"/>
             </manifest>
