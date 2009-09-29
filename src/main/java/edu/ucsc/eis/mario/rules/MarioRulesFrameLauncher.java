@@ -3,6 +3,7 @@ package edu.ucsc.eis.mario.rules;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.*;
 
@@ -68,6 +69,12 @@ public class MarioRulesFrameLauncher implements ActionListener
         
         frame.setJMenuBar(menuBar);
         frame.setVisible(true);
+        
+        try {
+            new Console();
+        } catch (IOException e) {
+        	System.err.println("Couldn't output console text: " + e);
+        }
         
         marioComponent.start();
 //        frame.addKeyListener(mario);
