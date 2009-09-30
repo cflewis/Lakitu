@@ -175,7 +175,7 @@ rule "marioTooHigh"
         System.err.println("Mario jumped too high");
         $mario.setJumpTime(-1);
         $mario.setYJumpSpeed(0);
-        $mario.setXJumpSpeed($mario.xa * 2.0f);
+        $mario.setXJumpSpeed($mario.xa * 1.5f);
 end
 
 //The window of time Mario jumped is too long

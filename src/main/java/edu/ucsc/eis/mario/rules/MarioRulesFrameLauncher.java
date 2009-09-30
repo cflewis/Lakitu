@@ -19,8 +19,10 @@ public class MarioRulesFrameLauncher implements ActionListener
 {
 	JRadioButtonMenuItem rulesEnabledMenuItem;
 	JRadioButtonMenuItem rulesDisabledMenuItem;
+	JCheckBoxMenuItem showConsoleMenuItem;
 	JRadioButtonMenuItem goodMenuItem;
 	JRadioButtonMenuItem badMenuItem;
+	Console console;
 	
 	Mario mario;
 		
@@ -56,6 +58,10 @@ public class MarioRulesFrameLauncher implements ActionListener
     	rulesDisabledMenuItem.addActionListener(this);
     	group1.add(rulesDisabledMenuItem);
     	rulesMenu.add(rulesDisabledMenuItem);
+    	
+    	showConsoleMenuItem = new JCheckBoxMenuItem("Show Rules Output");
+    	showConsoleMenuItem.addActionListener(this);
+    	rulesMenu.add(showConsoleMenuItem);
 
         MarioComponent marioComponent = new MarioComponent(640, 500, this);
         JFrame frame = new JFrame("Mario Test");
@@ -71,7 +77,7 @@ public class MarioRulesFrameLauncher implements ActionListener
         frame.setVisible(true);
         
         try {
-            new Console();
+            console = new Console();
         } catch (IOException e) {
         	System.err.println("Couldn't output console text: " + e);
         }
@@ -116,6 +122,14 @@ public class MarioRulesFrameLauncher implements ActionListener
 			Mario.stopMovementOnDeath = true;
 			Mario.coinValue = 1;
 			System.err.println("Good code enabled");
+		}
+		
+		if (source == showConsoleMenuItem) {
+			if (console.isVisible()) { 
+				console.setVisible(false); 
+			} else {
+				console.setVisible(true);
+			}
 		}
 	}
 	

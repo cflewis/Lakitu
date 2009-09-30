@@ -32,7 +32,7 @@ public class Console extends JFrame {
 		textArea.setColumns(50);
 		getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
 		pack();
-		setVisible(true);
+		setVisible(false);
 
 		// Create reader threads
 		new ReaderThread(piOut).start();
