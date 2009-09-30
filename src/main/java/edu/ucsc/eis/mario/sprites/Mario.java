@@ -758,6 +758,14 @@ public class Mario extends Sprite
 	public void setYJumpSpeed(float yJumpSpeed) {
 		this.yJumpSpeed = yJumpSpeed;
 	}
+	
+	public void setXJumpSpeed(float xJumpSpeed) {
+		this.xJumpSpeed = xJumpSpeed;
+	}
+
+	public int getFacing() {
+		return facing;
+	}
 
 	public LevelScene getWorld() {
 		return world;
