@@ -103,8 +103,9 @@ rule "marioDoubleJump"
     ruleflow-group "Integrity"
     when
         $jump1 : Jump()
-        $jump2 : Jump(this != $jump1, this after $jump1)
-        $mario : Mario(sliding == false, jumpTime != 0)
+        $jump2 : Jump(this != $jump1, this after $jump1,
+            mario.isSliding == false, mario.jumpTime != 0, $mario : mario)
+        //$mario : Mario(sliding == false, jumpTime != 0)
     then
         $mario.setJumpTime(-1);
         $mario.setYJumpSpeed(0);
