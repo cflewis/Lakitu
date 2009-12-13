@@ -46,31 +46,6 @@ rule "landingEventFound"
         System.err.println("Found a landing event: " + $landing);
 end
 
-rule "levelSceneFound"
-    ruleflow-group "Test"
-    when
-        $levelScene : LevelScene()
-    then
-        System.err.println("Found a level scene: " + $levelScene);
-end
-
-rule "levelFound"
-    ruleflow-group "Test"
-    when
-        LevelScene($level : level)
-    then
-        System.err.println("Found a level: " + $level);
-end
-
-rule "pitFound"
-    ruleflow-group "Test"
-    when
-        LevelScene($level : level)
-        $pit : Pit() from $level.pits
-    then
-        System.err.println("Found a pit: " + $pit);
-end
-
 rule "billSpawnEventFound"
     ruleflow-group "Test"
     when
@@ -85,23 +60,6 @@ rule "valueChangeFound"
         $change : ValueChange()
     then
         System.err.println("Found a value change: " + $change);
-end
-
-rule "marioFound"
-    ruleflow-group "Test"
-    when
-        $mario : Mario()
-    then
-        //System.err.println("Mario art is: " + $mario.getSheet());
-end
-
-# Test interaction
-rule "marioIsDucking"
-    ruleflow-group "Test"
-    when
-        $mario : Mario(ducking == true)
-    then 
-        //System.err.println("Mario is ducking!");
 end
 
 # Book-keeping rules to ensure working agenda is valid from tick-to-tick
@@ -127,57 +85,6 @@ rule "Retract all landings"
         retract($landing);
 end
 
-# Integrity rules
-rule "Stop Mario moving when he dies"
-    ruleflow-group "Integrity"
-    when
-        $mario : Mario(deathTime == 1)
-    then
-        $mario.xa = 0;
-        $mario.ya = 0;
-end        
-
-rule "stopMarioInteractionWhenDead"
-    ruleflow-group "Integrity"
-    when
-        $mario : Mario(deathTime > 0)
-    then
-        $mario.keys = new boolean[16];
-        System.err.println("Mario is dead");
-end
-
-/**
-* This one will only work if a new fact is inserted, as updating Mario
-* results in an implicit retraction and insertion, killing the activation
-* for this rule. An immutable object (only need one, so the inserting rule
-* should check for not(deathEvent())) could be inserted into the memory on the
-* rules side instead, and the duration calculated on that.
-*/
-//rule "End level if Mario dies"
-//    duration(1s)
-//    when
-//        $mario : Mario(deathTime > 0)
-//    then
-//        System.err.println("Mario should be dead now");
-//end
-
-/**
-* This is a hard and fast parameter bug, but won't catch
-* bugs that are caused by some other issue. For that, we'll
-* need complex event processing, which is the next rule
-*/
-
-rule "marioTooHigh"
-    ruleflow-group "Integrity"
-    when
-        $mario : Mario(jumpTime > 8)
-    then
-        System.err.println("Mario jumped too high");
-        $mario.setJumpTime(-1);
-        $mario.setYJumpSpeed(0);
-        $mario.setXJumpSpeed($mario.xa * 1.5f);
-end
-
 //The window of time Mario jumped is too long
 rule "marioJumpTooLong"
     ruleflow-group "Integrity"
@@ -191,76 +98,6 @@ rule "marioJumpTooLong"
         // 100 will bring Mario down *hard*
         $mario.setYJumpSpeed(100);
 end
-
-rule "pitTooLong"
-    ruleflow-group "Integrity"
-    when
-        LevelScene($level : level)
-        $pit : Pit((length > 4 && hasStairs == true) || 
-            (length > 6 && hasStairs == false)) 
-            from $level.pits
-    then
-        int requiredLength = 6;
-        int requiredHeight = 1;
-        
-        if ($pit.hasStairs == true) { 
-            requiredLength = 4;
-            requiredHeight = 3; 
-        }
-        
-        for (int x = $pit.getEndX(); x >= ($pit.getStartX() + requiredLength); x--) {
-            $level.setBlock(x, $level.height - 1, (byte) (9 + 0 * 16));
-            
-            for (int y = 1; y <= requiredHeight; y++) {
-                $level.setBlock(x, $level.height - y, (byte) (9 + 0 * 16)); 
-            }
-        }
-        
-        System.err.println("Found pit that is too long: " + $pit);
-end
-
-rule "marioAnimationSmall"
-    ruleflow-group "Integrity"
-    when
-        $mario : Mario(sheet != Art.smallMario)
-        eval($mario.isLarge() == false)
-        eval($mario.isFire() == false)
-    then
-        $mario.sheet = Art.smallMario;
-        System.err.println("Mario set to small art");
-end
-
-rule "marioAnimationLarge"
-    ruleflow-group "Integrity"
-    when
-        $mario : Mario(sheet != Art.mario)
-        eval($mario.isLarge() == true)
-        eval($mario.isFire() == false)
-    then
-        $mario.sheet = Art.mario;
-        System.err.println("Mario set to large art");
-end
-
-rule "marioAnimationFire"
-    ruleflow-group "Integrity"
-    when
-        $mario : Mario(sheet != Art.fireMario)
-        eval($mario.isFire() == true)
-    then
-        $mario.sheet = Art.fireMario;
-        System.err.println("Mario set to fire art");
-end
-
-rule "marioOutOfBounds"
-    ruleflow-group "Integrity"
-    when
-        LevelScene($level : level)
-        $mario : Mario((x < 0 || x > ($level.width * 16) || y < -60 || y > (($level.height * 16) + 20)), deathTime == 0)
-    then
-        System.err.println(String.format("Mario is out of bounds: (%f, %f) Death Time: %d, Level width/height: (%d, %d)",
-            $mario.getX(), $mario.getY(), $mario.deathTime, $level.width, $level.height));
-        $mario.die();
-end 
 
 rule "marioDoubleJump"
     ruleflow-group "Integrity"
@@ -299,4 +136,3 @@ rule "coinValue"
 end
 
  
-   

@@ -11,3 +11,5 @@ target/*
 jester*
 *.html
 makeWebView.py
+*.iml
+.idea

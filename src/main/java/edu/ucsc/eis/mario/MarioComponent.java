@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 
+import edu.ucsc.eis.mario.events.MarioEvent;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
@@ -361,7 +362,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     }
     
     public static FactHandle insertFact(Object fact) {
-    	if (ksession != null && rulesEnabled) {
+    	if (ksession != null && rulesEnabled && fact instanceof MarioEvent) {
     		return ksession.insert(fact);
     	}
     	
