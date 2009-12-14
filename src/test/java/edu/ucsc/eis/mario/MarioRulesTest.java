@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
+import javax.jms.*;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.conf.EventProcessingOption;
@@ -48,6 +50,8 @@ public class MarioRulesTest {
 	protected StatefulKnowledgeSession ksession;
 	protected TrackingAgendaEventListener trackingAgendaEventListener;
 	protected boolean rulesEnabled;
+    protected MessageProducer producer;
+    protected Session session;
 	
 	public MarioRulesTest() {
 		rulesEnabled = true;
@@ -97,6 +101,19 @@ public class MarioRulesTest {
 			t.printStackTrace();
 			System.exit(1);
 		}
+
+        try {
+            ConnectionFactory factory =
+                    new ActiveMQConnectionFactory("tcp://localhost:61616");
+            Connection connection = factory.createConnection();
+            connection.start();
+            MarioComponent.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Destination destination = MarioComponent.session.createQueue("mariotest");
+            MarioComponent.producer = MarioComponent.session.createProducer(destination);
+        } catch (Exception e) {
+            System.err.println("Couldn't connect to broker");
+            e.printStackTrace();
+        }
 		
 		mario.keys[Mario.KEY_JUMP] = false;
 		tickScene(500);

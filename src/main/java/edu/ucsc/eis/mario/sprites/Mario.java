@@ -12,8 +12,10 @@ import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.events.ValueChange;
 import edu.ucsc.eis.mario.level.*;
 
+import java.io.Serializable;
 
-public class Mario extends Sprite
+
+public class Mario extends Sprite implements Serializable
 {
     public static boolean large = false;
     public static boolean fire = false;
@@ -60,7 +62,7 @@ public class Mario extends Sprite
     int width = 4;
     int height = 24;
 
-    private LevelScene world;
+    private transient LevelScene world;
     public int facing;
     private int powerUpTime = 0;
 
@@ -70,8 +72,8 @@ public class Mario extends Sprite
     public int winTime = 0;
     private int invulnerableTime = 0;
 
-    public Sprite carried = null;
-    private static Mario instance;
+    public transient Sprite carried = null;
+    private transient static Mario instance;
 
     public Mario(LevelScene world)
     {
@@ -197,14 +199,7 @@ public class Mario extends Sprite
 
         if (onGround)
         {
-            if (keys[KEY_DOWN] && large)
-            {
-                ducking = true;
-            }
-            else
-            {
-                ducking = false;
-            }
+            ducking = keys[KEY_DOWN] && large;
         }
 
         if (xa > 2)
@@ -802,4 +797,8 @@ public class Mario extends Sprite
 	public void setSliding(boolean sliding) {
 		this.sliding = sliding;
 	}
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

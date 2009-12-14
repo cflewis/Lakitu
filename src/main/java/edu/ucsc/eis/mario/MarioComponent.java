@@ -33,6 +33,9 @@ import edu.ucsc.eis.mario.rules.KnowledgeFactory;
 import edu.ucsc.eis.mario.rules.MarioRulesFrameLauncher;
 import edu.ucsc.eis.mario.sprites.*;
 
+import javax.jms.*;
+import org.apache.activemq.ActiveMQConnectionFactory;
+
 
 public class MarioComponent extends JComponent implements Runnable, KeyListener, FocusListener
 {
@@ -55,7 +58,11 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private MarioRulesFrameLauncher parent;
 
     private Scale2x scale2x = new Scale2x(320, 240);
-    
+
+    public static MessageProducer producer;
+    public static Session session;
+    public static MessageConsumer consumer;
+
     public MarioComponent(int width, int height) {
     	this(width, height, null);
     }
@@ -129,7 +136,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     public void paintComponent(Graphics g) {
     	super.paintComponent(g);
     }
-    
+
     public void start()
     {
         if (!running)
@@ -170,28 +177,42 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         addFocusListener(this);
         initKnowledgeSession();
 
+        try {
+            ConnectionFactory factory =
+                    new ActiveMQConnectionFactory("tcp://localhost:61616");
+            Connection connection = factory.createConnection();
+            connection.start();
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Destination destination = session.createQueue("mariotest");
+            producer = session.createProducer(destination);
+            consumer = session.createConsumer(destination);
+        } catch (Exception e) {
+            System.err.println("Couldn't connect to broker");
+            System.exit(1);
+        }
+
         toTitle();
         adjustFPS();
-        
+
         FactHandle marioFact = null;
 
         while (running)
-        {	
+        {
             scene.tick();
-                        
+
         	if (scene instanceof LevelScene && rulesEnabled) {
-        		Mario mario = ((LevelScene) scene).mario;
-        		if (marioFact == null) {
-        			marioFact = ksession.insert(mario);
-        		}
-        		else
-        		{
-        			ksession.update(marioFact, mario);
-        		}
-        		
+                Message message;
+                try {
+        		    while ((message = consumer.receiveNoWait()) != null) {
+                        ObjectMessage objectMessage = (ObjectMessage) message;
+                        System.out.println("Inserting event " + objectMessage);
+                        ksession.insert((MarioEvent) objectMessage.getObject());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         		ksession.startProcess("Mario");
         		ksession.fireAllRules();
-        		ksession.update(marioFact, mario);
         	}
 
             float alpha = (float) (System.currentTimeMillis() - lTick);
@@ -234,7 +255,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
             {
                 g.drawImage(image, 0, 0, null);
             }
-            
+
             if (delay > 0)
                 try {
                     tm += delay;
@@ -290,7 +311,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         scene.setSound(sound);
         scene.init();
         if (parent != null) {parent.setMario(ls.mario);}
-        sceneHandle = MarioComponent.insertFact(ls);
+        //sceneHandle = MarioComponent.insertFact(ls);
     }
 
     public void levelFailed()
@@ -325,14 +346,14 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         mapScene.startMusic();
         mapScene.levelWon();
     }
-    
+
     public void win()
     {
         scene = new WinScene(this);
         scene.setSound(sound);
         scene.init();
     }
-    
+
     public void toTitle()
     {
         Mario.resetStatic();
@@ -340,7 +361,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         scene.setSound(sound);
         scene.init();
     }
-    
+
     public void lose()
     {
         scene = new LoseScene(this);
@@ -354,27 +375,36 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         mapScene.startMusic();
         mapScene.init();
    }
-    
+
     public void adjustFPS() {
         int fps = 24;
         delay = (fps > 0) ? (fps >= 100) ? 0 : (1000 / fps) : 100;
 //        System.out.println("Delay: " + delay);
     }
-    
-    public static FactHandle insertFact(Object fact) {
-    	if (ksession != null && rulesEnabled && fact instanceof MarioEvent) {
-    		return ksession.insert(fact);
+
+    public static void insertFact(Object fact) {
+    	if (ksession != null && rulesEnabled && fact != null && fact instanceof MarioEvent) {
+            MarioEvent marioFact = (MarioEvent)fact;
+
+            if (session == null) {
+                System.err.println("Session is null, throwing away " + marioFact);
+            } else {
+                try {
+                    System.err.println("Sending fact " + marioFact);
+                    producer.send(session.createObjectMessage(marioFact));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
     	}
-    	
-    	return null;
     }
-    
+
     public static long getClockTime() {
     	long time = System.currentTimeMillis();
     	if (ksession != null) {
     		time = ksession.getSessionClock().getCurrentTime();
     	}
-    	
+
     	return time;
     }
 }
