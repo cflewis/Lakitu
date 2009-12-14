@@ -167,7 +167,7 @@ public class Art
                 sequencer.setSequence((Sequence)null);
                 sequencer.setSequence(songs[song]);
                 sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
-                sequencer.start();
+                //sequencer.start();
             }
             catch (Exception e)
             {

@@ -178,8 +178,9 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         initKnowledgeSession();
 
         try {
-            ConnectionFactory factory =
-                    new ActiveMQConnectionFactory("tcp://localhost:61616");
+            ActiveMQConnectionFactory factory =
+                    new ActiveMQConnectionFactory("tcp://eisbox.soe.ucsc.edu:61616");
+            factory.setUseAsyncSend(true);
             Connection connection = factory.createConnection();
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
