@@ -14,6 +14,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 
 import edu.ucsc.eis.mario.events.MarioEvent;
+import edu.ucsc.eis.mario.repairs.RepairEvent;
+import edu.ucsc.eis.mario.repairs.RepairHandler;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
@@ -179,7 +181,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 
         try {
             ActiveMQConnectionFactory factory =
-                    new ActiveMQConnectionFactory("tcp://eisbox.soe.ucsc.edu:61616");
+                    new ActiveMQConnectionFactory("tcp://localhost:61616");
             factory.setUseAsyncSend(true);
             Connection connection = factory.createConnection();
             connection.start();
@@ -189,13 +191,17 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
             consumer = session.createConsumer(destination);
         } catch (Exception e) {
             System.err.println("Couldn't connect to broker");
-            System.exit(1);
+            //System.exit(1);
         }
 
+        ksession.setGlobal("producer", producer);
+        ksession.setGlobal("session", session);
         toTitle();
         adjustFPS();
 
         FactHandle marioFact = null;
+        RepairHandler repairHandler = new RepairHandler();
+
 
         while (running)
         {
@@ -205,9 +211,23 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
                 Message message;
                 try {
         		    while ((message = consumer.receiveNoWait()) != null) {
+                        System.out.println("Got message " + message);
                         ObjectMessage objectMessage = (ObjectMessage) message;
-                        System.out.println("Inserting event " + objectMessage);
-                        ksession.insert((MarioEvent) objectMessage.getObject());
+                        Object payload = objectMessage.getObject();
+
+                        if (payload instanceof MarioEvent) {
+                            System.out.println("Inserting event " + payload);
+                            ksession.insert((MarioEvent) payload);
+                        }
+                        else if (payload instanceof RepairEvent) {
+                            System.out.println("Handling repair " + payload);
+                            RepairEvent rp = (RepairEvent) payload;
+                            repairHandler.setMario(((LevelScene) scene).mario);
+                            repairHandler.execute((RepairEvent) payload);
+                        }
+                        else {
+                            System.out.println("Can't find type of message");
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -280,9 +300,10 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 			KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
 			config.setOption( ClockTypeOption.get("realtime") );
 
-		} catch (Throwable t) {
-			t.printStackTrace();
-			System.exit(1);
+		} catch (Exception e) {
+            System.err.println("Couldn't parse rules " + e);
+			e.printStackTrace();
+			//System.exit(2);
 		}
 	}
 

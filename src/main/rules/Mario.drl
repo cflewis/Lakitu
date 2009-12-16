@@ -3,15 +3,18 @@ package edu.ucsc.eis.mario
 
 #list any import classes here.
 import edu.ucsc.eis.mario.sprites.*
-import edu.ucsc.eis.mario.events.* 
+import edu.ucsc.eis.mario.events.*
+import edu.ucsc.eis.mario.repairs.*
 import edu.ucsc.eis.mario.level.Pit
 import java.util.ArrayList
 import java.util.Iterator
 import java.util.Collections
-import function org.mockito.Mockito.* 
-
+import javax.jms.*
+import function org.mockito.Mockito.*
 
 #declare any global variables here
+global javax.jms.MessageProducer producer
+global javax.jms.Session session
 
 declare Jump
     @role(event)
@@ -94,9 +97,13 @@ rule "marioJumpTooLong"
         not(Landing(this after[0s,2s] $jump))
     then
         System.err.println("Mario jumped too long");
-        $mario.setJumpTime(-1);
-        // 100 will bring Mario down *hard*
-        $mario.setYJumpSpeed(100);
+
+        try {
+            producer.send(session.createObjectMessage(new MarioMovement(false, null, null)));
+        } catch (Exception e) {
+            System.err.println("Exception1 " + e);
+            e.printStackTrace();
+        }
 end
 
 rule "marioDoubleJump"

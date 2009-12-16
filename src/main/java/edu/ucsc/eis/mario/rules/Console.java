@@ -19,12 +19,12 @@ public class Console extends JFrame {
 		// Set up System.out
 		piOut = new PipedInputStream();
 		poOut = new PipedOutputStream(piOut);
-		System.setOut(new PrintStream(poOut, true));
+		//System.setOut(new PrintStream(poOut, true));
 
 		// Set up System.err
 		piErr = new PipedInputStream();
 		poErr = new PipedOutputStream(piErr);
-		System.setErr(new PrintStream(poErr, true));
+		//System.setErr(new PrintStream(poErr, true));
 
 		// Add a scrolling text area
 		textArea.setEditable(false);
