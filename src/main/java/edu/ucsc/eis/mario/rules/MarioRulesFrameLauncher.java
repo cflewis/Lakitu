@@ -64,7 +64,7 @@ public class MarioRulesFrameLauncher implements ActionListener
     	rulesMenu.add(showConsoleMenuItem);
 
         MarioComponent marioComponent = new MarioComponent(640, 500, this);
-        JFrame frame = new JFrame("Mario Test");
+        JFrame frame = new JFrame("Lakitu");
         frame.setContentPane(marioComponent);
         frame.pack();
         frame.setResizable(false);
