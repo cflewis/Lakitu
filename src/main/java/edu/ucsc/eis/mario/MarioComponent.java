@@ -14,6 +14,9 @@ import javax.swing.*;
 import edu.ucsc.eis.mario.events.MarioEvent;
 import edu.ucsc.eis.mario.repairs.RepairEvent;
 import edu.ucsc.eis.mario.repairs.RepairHandler;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
@@ -57,6 +60,8 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     public static MessageProducer producer;
     public static Session session;
     public static MessageConsumer consumer;
+
+    private static Logger logger = Logger.getLogger("edu.ucsc.eis.mario");
 
     public MarioComponent(int width, int height) {
     	this(width, height, null);
@@ -189,6 +194,8 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 
         ksession.setGlobal("producer", producer);
         ksession.setGlobal("session", session);
+        ksession.setGlobal("logger", logger);
+
         toTitle();
         adjustFPS();
 
@@ -204,22 +211,22 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
                 Message message;
                 try {
         		    while ((message = consumer.receiveNoWait()) != null) {
-                        System.out.println("Got message " + message);
+                        logger.debug("Got message " + message);
                         ObjectMessage objectMessage = (ObjectMessage) message;
                         Object payload = objectMessage.getObject();
 
                         if (payload instanceof MarioEvent) {
-                            System.out.println("Inserting event " + payload);
+                            logger.info("Inserting event " + payload);
                             ksession.insert((MarioEvent) payload);
                         }
                         else if (payload instanceof RepairEvent) {
-                            System.out.println("Handling repair " + payload);
+                            logger.info("Handling repair " + payload);
                             RepairEvent rp = (RepairEvent) payload;
                             repairHandler.setMario(((LevelScene) scene).mario);
                             repairHandler.execute((RepairEvent) payload);
                         }
                         else {
-                            System.out.println("Can't find type of message");
+                            logger.warn("Can't find type of message");
                         }
                     }
                 } catch (Exception e) {
@@ -394,7 +401,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     public void adjustFPS() {
         int fps = 24;
         delay = (fps > 0) ? (fps >= 100) ? 0 : (1000 / fps) : 100;
-//        System.out.println("Delay: " + delay);
+        logger.debug("Delay: " + delay);
     }
 
     public static void insertFact(Object fact) {
@@ -402,10 +409,10 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
             MarioEvent marioFact = (MarioEvent)fact;
 
             if (session == null) {
-                System.err.println("Session is null, throwing away " + marioFact);
+                logger.warn("Session is null, throwing away " + marioFact);
             } else {
                 try {
-                    System.err.println("Sending fact " + marioFact);
+                    logger.info("Sending fact " + marioFact);
                     producer.send(session.createObjectMessage(marioFact));
                 } catch (Exception e) {
                     e.printStackTrace();

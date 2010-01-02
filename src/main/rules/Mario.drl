@@ -11,10 +11,12 @@ import java.util.Iterator
 import java.util.Collections
 import javax.jms.*
 import function org.mockito.Mockito.*
+import org.apache.log4j.Logger
 
 #declare any global variables here
 global javax.jms.MessageProducer producer
 global javax.jms.Session session
+global org.apache.log4j.Logger logger
 
 declare Jump
     @role(event)
@@ -38,7 +40,7 @@ rule "jumpEventFound"
     when
         $jump : Jump()
     then
-        System.err.println("Found a jump event: " + $jump);
+        logger.debug("Found a jump event: " + $jump);
 end
 
 rule "landingEventFound"
@@ -46,7 +48,7 @@ rule "landingEventFound"
     when
         $landing : Landing()
     then
-        System.err.println("Found a landing event: " + $landing);
+        logger.debug("Found a landing event: " + $landing);
 end
 
 rule "billSpawnEventFound"
@@ -54,7 +56,7 @@ rule "billSpawnEventFound"
     when
         $bill : BulletBillSpawn()
     then
-        System.err.println("Found a Bullet Bill: " + $bill);
+        logger.debug("Found a Bullet Bill: " + $bill);
 end
 
 rule "valueChangeFound"
@@ -62,7 +64,7 @@ rule "valueChangeFound"
     when
         $change : ValueChange()
     then
-        System.err.println("Found a value change: " + $change);
+        logger.debug("Found a value change: " + $change);
 end
 
 # Book-keeping rules to ensure working agenda is valid from tick-to-tick
@@ -96,14 +98,14 @@ rule "marioJumpTooLong"
         $jump : Jump($mario : mario)
         not(Landing(this after[0s,2s] $jump))
     then
-        System.err.println("Mario jumped too long");
+        logger.info("Mario jumped too long");
         
         try {
             producer.send(session.createObjectMessage(new MarioMovement(false, null, null)));
         } catch (Exception e) {
             if (producer == null) { System.err.println("Producer was null"); }
             if (session == null) { System.err.println("Session was null"); }
-            System.err.println("Jump too long exception " + e);
+            logger.error("Jump too long exception " + e);
             e.printStackTrace();
         }
 end
@@ -119,7 +121,7 @@ rule "marioDoubleJump"
         $mario.setJumpTime(-1);
         $mario.setYJumpSpeed(0);
         retract($jump2);
-        System.err.println("Mario double jumped");
+        logger.info("Mario double jumped");
 end
 
 // Find all Bullet Bills spawned from the same cannon in the last 10 seconds
@@ -133,7 +135,7 @@ rule "bulletBillSpawn"
         LevelScene levelScene = newestBillSpawn.getBulletBill().getWorld();
         levelScene.removeSprite(newestBillSpawn.getBulletBill());
         retract(newestBillSpawn);
-        System.err.println("Bullet bills firing too fast, retracted " + newestBillSpawn);
+        logger.info("Bullet bills firing too fast, retracted " + newestBillSpawn);
 end
 
 rule "coinValue"

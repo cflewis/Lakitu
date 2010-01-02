@@ -106,6 +106,21 @@
 			         </dependency>
 				</dependencies>			
 			      </plugin>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <version>1.1</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>exec</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <mainClass>edu.ucsc.eis.mario.rules.LakituFrameLauncher</mainClass>
+              </configuration>
+            </plugin>
 			
         </plugins>
     </build>
@@ -194,6 +209,11 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
             <version>5.2.0</version>
+        </dependency>
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.15</version>
         </dependency>
     </dependencies>
 </project>

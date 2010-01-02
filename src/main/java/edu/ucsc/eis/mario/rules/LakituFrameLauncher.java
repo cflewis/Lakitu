@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+
 import javax.swing.*;
 
 import edu.ucsc.eis.mario.Art;
@@ -12,6 +15,8 @@ import edu.ucsc.eis.mario.MarioComponent;
 import edu.ucsc.eis.mario.level.LevelGenerator;
 import edu.ucsc.eis.mario.sprites.BulletBill;
 import edu.ucsc.eis.mario.sprites.Mario;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 public class LakituFrameLauncher implements ActionListener
 {
@@ -21,10 +26,22 @@ public class LakituFrameLauncher implements ActionListener
 	JRadioButtonMenuItem goodMenuItem;
 	JRadioButtonMenuItem badMenuItem;
 	Console console;
+
+    Logger logger;
 	
 	Mario mario;
-		
+
 	public LakituFrameLauncher() {
+        Logger activeMqLogger = Logger.getLogger("org.apache.activemq");
+        activeMqLogger.setLevel(Level.WARN);
+
+        logger = Logger.getLogger("edu.ucsc.eis.mario");
+
+        PatternLayout layout = new PatternLayout("%C{1} - %m\n");
+        ConsoleAppender appender = new ConsoleAppender(layout);
+        logger.addAppender(appender);
+        logger.setLevel(Level.INFO);
+
     	JMenuBar menuBar = new JMenuBar();
     	JMenu versionMenu = new JMenu("Version");
     	versionMenu.getPopupMenu().setLightWeightPopupEnabled(false);
@@ -87,17 +104,15 @@ public class LakituFrameLauncher implements ActionListener
 
     public void actionPerformed(ActionEvent e) {
 		JMenuItem source = (JMenuItem) e.getSource();
-		
-		System.err.println("Hello" + e);
-		
+
 		if (source == rulesEnabledMenuItem) {
 			MarioComponent.rulesEnabled = true;
-			System.err.println("ruled enabled");
+			logger.info("Rules enabled");
 		}
 		
 		if (source == rulesDisabledMenuItem) {
 			MarioComponent.rulesEnabled = false;
-			System.err.println("ruled disabled");
+			logger.info("Rules disabled");
 		}
 		
 		if (source == badMenuItem) {
@@ -109,7 +124,7 @@ public class LakituFrameLauncher implements ActionListener
 			Mario.coinValue = 2;
 			if (mario != null) {mario.sheet = Art.fireMario;}
 
-			System.err.println("Bad code enabled");
+			logger.info("Bad code enabled");
 		}
 		
 		if (source == goodMenuItem) {
@@ -119,7 +134,7 @@ public class LakituFrameLauncher implements ActionListener
 			Mario.dieOnFall = true;
 			Mario.stopMovementOnDeath = true;
 			Mario.coinValue = 1;
-			System.err.println("Good code enabled");
+			logger.info("Good code enabled");
 		}
 		
 		if (source == showConsoleMenuItem) {
