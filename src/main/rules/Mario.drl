@@ -101,6 +101,8 @@ rule "marioJumpTooLong"
         try {
             producer.send(session.createObjectMessage(new MarioMovement(false, null, null)));
         } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
             System.err.println("Jump too long exception " + e);
             e.printStackTrace();
         }

@@ -107,9 +107,13 @@ public class MarioRulesTest {
                     new ActiveMQConnectionFactory("tcp://localhost:61616");
             Connection connection = factory.createConnection();
             connection.start();
-            MarioComponent.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = MarioComponent.session.createQueue("mariotest");
-            MarioComponent.producer = MarioComponent.session.createProducer(destination);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Destination destination = session.createQueue("mariotest");
+            producer = session.createProducer(destination);
+            ksession.setGlobal("producer", producer);
+            ksession.setGlobal("session", session);
+            MarioComponent.session = session;
+            MarioComponent.producer = producer;
         } catch (Exception e) {
             System.err.println("Couldn't connect to broker");
             e.printStackTrace();
