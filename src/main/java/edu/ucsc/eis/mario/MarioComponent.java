@@ -1,14 +1,12 @@
 package edu.ucsc.eis.mario;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.*;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
@@ -18,21 +16,16 @@ import edu.ucsc.eis.mario.repairs.RepairEvent;
 import edu.ucsc.eis.mario.repairs.RepairHandler;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
-import org.drools.runtime.conf.KnowledgeSessionOption;
 import org.drools.runtime.rule.FactHandle;
-import org.drools.time.SessionPseudoClock;
 
 import com.mojang.sonar.FakeSoundEngine;
 import com.mojang.sonar.SonarSoundEngine;
 
 import edu.ucsc.eis.mario.rules.KnowledgeFactory;
-import edu.ucsc.eis.mario.rules.MarioRulesFrameLauncher;
+import edu.ucsc.eis.mario.rules.LakituFrameLauncher;
 import edu.ucsc.eis.mario.sprites.*;
 
 import javax.jms.*;
@@ -57,7 +50,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     public static StatefulKnowledgeSession ksession;
     FactHandle sceneHandle;
     public static boolean rulesEnabled = true;
-    private MarioRulesFrameLauncher parent;
+    private LakituFrameLauncher parent;
 
     private Scale2x scale2x = new Scale2x(320, 240);
 
@@ -69,7 +62,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     	this(width, height, null);
     }
 
-    public MarioComponent(int width, int height, MarioRulesFrameLauncher parent)
+    public MarioComponent(int width, int height, LakituFrameLauncher parent)
     {
         this.setFocusable(true);
         this.setEnabled(true);

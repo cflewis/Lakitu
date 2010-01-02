@@ -15,7 +15,7 @@
     </properties>
     <scm>
         <developerConnection>
-            scm:git:git@github.com:Lewisham/Infinite-Mario-Rules.git
+            scm:git:git@github.com:Lewisham/Lakitu.git
         </developerConnection>
     </scm>
 
@@ -64,7 +64,7 @@
 			       </descriptorRefs>
 			       <archive>
 			         <manifest>
-			           <mainClass>edu.ucsc.eis.mario.rules.MarioRulesFrameLauncher</mainClass>
+			           <mainClass>edu.ucsc.eis.mario.rules.LakituFrameLauncher</mainClass>
 			         </manifest>
 			       </archive>
 			     </configuration>

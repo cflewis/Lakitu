@@ -7,15 +7,13 @@ import java.io.IOException;
 
 import javax.swing.*;
 
-import com.google.common.base.Preconditions;
-
 import edu.ucsc.eis.mario.Art;
 import edu.ucsc.eis.mario.MarioComponent;
 import edu.ucsc.eis.mario.level.LevelGenerator;
 import edu.ucsc.eis.mario.sprites.BulletBill;
 import edu.ucsc.eis.mario.sprites.Mario;
 
-public class MarioRulesFrameLauncher implements ActionListener
+public class LakituFrameLauncher implements ActionListener
 {
 	JRadioButtonMenuItem rulesEnabledMenuItem;
 	JRadioButtonMenuItem rulesDisabledMenuItem;
@@ -26,7 +24,7 @@ public class MarioRulesFrameLauncher implements ActionListener
 	
 	Mario mario;
 		
-	public MarioRulesFrameLauncher() {
+	public LakituFrameLauncher() {
     	JMenuBar menuBar = new JMenuBar();
     	JMenu versionMenu = new JMenu("Version");
     	versionMenu.getPopupMenu().setLightWeightPopupEnabled(false);
@@ -86,8 +84,8 @@ public class MarioRulesFrameLauncher implements ActionListener
 //        frame.addKeyListener(mario);
 //        frame.addFocusListener(mario);
 	}
-	
-	public void actionPerformed(ActionEvent e) {		
+
+    public void actionPerformed(ActionEvent e) {
 		JMenuItem source = (JMenuItem) e.getSource();
 		
 		System.err.println("Hello" + e);
@@ -139,6 +137,6 @@ public class MarioRulesFrameLauncher implements ActionListener
 	
     public static void main(String[] args)
     {
-    	new MarioRulesFrameLauncher();
+    	new LakituFrameLauncher();
     }
 }
