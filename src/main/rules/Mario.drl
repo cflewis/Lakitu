@@ -97,7 +97,13 @@ rule "marioJumpTooLong"
         not(Landing(this after[0s,2s] $jump))
     then
         System.err.println("Mario jumped too long");
-        producer.send(session.createObjectMessage(new MarioMovement(false, null, null)));
+        
+        try {
+            producer.send(session.createObjectMessage(new MarioMovement(false, null, null)));
+        } catch (Exception e) {
+            System.err.println("Jump too long exception " + e);
+            e.printStackTrace();
+        }
 end
 
 rule "marioDoubleJump"
