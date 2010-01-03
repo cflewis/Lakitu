@@ -76,7 +76,7 @@ public class LakituFrameLauncher implements ActionListener
     	
     	showConsoleMenuItem = new JCheckBoxMenuItem("Show Rules Output");
     	showConsoleMenuItem.addActionListener(this);
-    	rulesMenu.add(showConsoleMenuItem);
+    	//rulesMenu.add(showConsoleMenuItem);
 
         MarioComponent marioComponent = new MarioComponent(640, 500, this);
         JFrame frame = new JFrame("Lakitu");

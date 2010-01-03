@@ -22,6 +22,7 @@ import javax.imageio.ImageIO;
 import javax.jms.*;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.conf.EventProcessingOption;
@@ -112,6 +113,7 @@ public class MarioRulesTest {
             producer = session.createProducer(destination);
             ksession.setGlobal("producer", producer);
             ksession.setGlobal("session", session);
+            ksession.setGlobal("logger", Logger.getLogger("edu.ucsc.eis.mario"));
             MarioComponent.session = session;
             MarioComponent.producer = producer;
         } catch (Exception e) {
