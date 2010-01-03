@@ -103,6 +103,12 @@ public class MarioRulesTest {
 			System.exit(1);
 		}
 
+        /** Note: Jester will work with this setup if and only if:
+         * 1. ActiveMQ is loaded as part of test-compile, so it's ready when
+         * tests are run.
+         * 2. I'm using my Simple Grester that uses "mvn test". Any other
+         * test bootstrap will fail (including IDEs that just run JUnit
+         */
         try {
             ConnectionFactory factory =
                     new ActiveMQConnectionFactory("tcp://localhost:61616");
