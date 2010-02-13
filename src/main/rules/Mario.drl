@@ -90,6 +90,38 @@ rule "Retract all landings"
         retract($landing);
 end
 
+rule "retractDeath"
+    ruleflow-group "Bookkeeping"
+    when
+        $newLives : ArrayList(size > 0) from collect(NewLife())
+        $deaths : ArrayList(size > 0) from collect(Death())
+    then
+        for (Object death : $deaths) {
+            retract(death);
+        }
+
+        for (Object newLife : $newLives) {
+            retract(newLife);
+        }
+end
+
+rule "sendSentinel"
+    ruleflow-group "Bookkeeping"
+    when
+        String()
+    then
+        logger.debug("Sending sentinel");
+
+        try {
+            producer.send(session.createTextMessage("Sentinel"));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Sentinel exception " + e);
+            e.printStackTrace();
+        }
+end
+
 //The window of time Mario jumped is too long
 rule "marioJumpTooLong"
     ruleflow-group "Integrity"
@@ -110,18 +142,41 @@ rule "marioJumpTooLong"
         }
 end
 
+rule "marioJumpTooHigh"
+    ruleflow-group "Integrity"
+    when
+        $jump : Jump(jumpTime > 7)
+    then
+        logger.info("Mario jumped too high");
+
+        try {
+            producer.send(session.createObjectMessage(new MarioMovement(false, 10f, $jump.getMario().xa * 3.0f)));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Jump too high exception " + e);
+            e.printStackTrace();
+        }
+end
+
 rule "marioDoubleJump"
     ruleflow-group "Integrity"
     when
         $jump1 : Jump()
         $jump2 : Jump(this != $jump1, this after $jump1,
             mario.isSliding == false, mario.jumpTime != 0, $mario : mario)
-        //$mario : Mario(sliding == false, jumpTime != 0)
     then
-        $mario.setJumpTime(-1);
-        $mario.setYJumpSpeed(0);
-        retract($jump2);
         logger.info("Mario double jumped");
+
+        try {
+            producer.send(session.createObjectMessage(new MarioMovement(false, null, null)));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Jump too long exception " + e);
+            e.printStackTrace();
+        }
+        retract($jump2);
 end
 
 // Find all Bullet Bills spawned from the same cannon in the last 10 seconds
@@ -145,6 +200,24 @@ rule "coinValue"
     then
         Mario.coins = $change.getStartValue() + 1;
         retract($change);
+end
+
+rule "stopMarioInteractionWhenDead"
+    ruleflow-group "Integrity"
+    when
+        Death()
+    then
+        try {
+            //producer.send(session.createObjectMessage(new MarioMovement(null, 0f, 0f)));
+            producer.send(session.createObjectMessage(new DisableKeys()));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Jump too high exception " + e);
+            e.printStackTrace();
+        }
+
+        logger.info("Mario is dead, stopping movement");
 end
 
  

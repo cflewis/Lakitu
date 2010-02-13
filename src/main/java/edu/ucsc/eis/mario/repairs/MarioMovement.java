@@ -9,10 +9,10 @@ package edu.ucsc.eis.mario.repairs;
  */
 public class MarioMovement extends RepairEvent {
     public final Boolean jumping;
-    public final Integer ySpeed;
-    public final Integer xSpeed;
+    public final Float ySpeed;
+    public final Float xSpeed;
 
-    public MarioMovement(Boolean jumping, Integer ySpeed, Integer xSpeed) {
+    public MarioMovement(Boolean jumping, Float ySpeed, Float xSpeed) {
         this.jumping = jumping;
         this.ySpeed = ySpeed;
         this.xSpeed = xSpeed;
@@ -29,7 +29,12 @@ public class MarioMovement extends RepairEvent {
             }
         }
 
-        if (ySpeed != null) { this.mario.ya = ySpeed; }
-        if (xSpeed != null) { this.mario.xa = xSpeed; }
+        if (mario.getJumpTime() == 0) {
+            if (ySpeed != null) { this.mario.ya = ySpeed; }
+            if (xSpeed != null) { this.mario.xa = xSpeed; }
+        } else {
+            if (ySpeed != null) { this.mario.setYJumpSpeed(ySpeed); }
+            if (xSpeed != null) { this.mario.setXJumpSpeed(xSpeed); }
+        }
     }
 }

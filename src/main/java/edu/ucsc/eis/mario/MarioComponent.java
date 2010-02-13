@@ -12,6 +12,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 
 import edu.ucsc.eis.mario.events.MarioEvent;
+import edu.ucsc.eis.mario.events.NewLife;
 import edu.ucsc.eis.mario.repairs.RepairEvent;
 import edu.ucsc.eis.mario.repairs.RepairHandler;
 import org.apache.log4j.BasicConfigurator;
@@ -180,7 +181,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         try {
             ActiveMQConnectionFactory factory =
                     new ActiveMQConnectionFactory("tcp://localhost:61616");
-            factory.setUseAsyncSend(true);
+            //factory.setUseAsyncSend(true);
             Connection connection = factory.createConnection();
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -202,22 +203,38 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         FactHandle marioFact = null;
         RepairHandler repairHandler = new RepairHandler();
 
+//        FactHandle triggerFact = ksession.insert("Trigger");
 
         while (running)
         {
             scene.tick();
 
-        	if (scene instanceof LevelScene && rulesEnabled) {
+        	if (scene instanceof LevelScene) {
                 Message message;
+                boolean gotMessage = false;
+
+//                ksession.update(triggerFact, "Trigger");
+//                ksession.startProcess("Mario");
+//                ksession.fireAllRules();
+
                 try {
+                    //while ((message = consumer.receive()) != null) {
         		    while ((message = consumer.receiveNoWait()) != null) {
                         logger.debug("Got message " + message);
+
+                        if (message instanceof TextMessage) { break; } //continue
+                        gotMessage = true;
+
                         ObjectMessage objectMessage = (ObjectMessage) message;
                         Object payload = objectMessage.getObject();
 
                         if (payload instanceof MarioEvent) {
                             logger.info("Inserting event " + payload);
                             ksession.insert((MarioEvent) payload);
+                            if (rulesEnabled && gotMessage) {
+                                ksession.startProcess("Mario");
+                                ksession.fireAllRules();
+                            }
                         }
                         else if (payload instanceof RepairEvent) {
                             logger.info("Handling repair " + payload);
@@ -232,8 +249,6 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-        		ksession.startProcess("Mario");
-        		ksession.fireAllRules();
         	}
 
             float alpha = (float) (System.currentTimeMillis() - lTick);
@@ -342,6 +357,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         scene = mapScene;
         mapScene.startMusic();
         Mario.lives--;
+        ksession.insert(new NewLife());
         if (Mario.lives == 0)
         {
             lose();
@@ -405,7 +421,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     }
 
     public static void insertFact(Object fact) {
-    	if (ksession != null && rulesEnabled && fact != null && fact instanceof MarioEvent) {
+    	if (ksession != null && fact != null && fact instanceof MarioEvent && rulesEnabled) {
             MarioEvent marioFact = (MarioEvent)fact;
 
             if (session == null) {

@@ -7,6 +7,7 @@ import edu.ucsc.eis.mario.Art;
 import edu.ucsc.eis.mario.LevelScene;
 import edu.ucsc.eis.mario.MarioComponent;
 import edu.ucsc.eis.mario.Scene;
+import edu.ucsc.eis.mario.events.Death;
 import edu.ucsc.eis.mario.events.Jump;
 import edu.ucsc.eis.mario.events.Landing;
 import edu.ucsc.eis.mario.events.ValueChange;
@@ -221,7 +222,6 @@ public class Mario extends Sprite implements Serializable
             }
             else if (onGround && mayJump)
             {
-            	MarioComponent.insertFact(new Jump(this));
                 world.sound.play(Art.samples[Art.SAMPLE_MARIO_JUMP], this, 1, 1, 1);
                 xJumpSpeed = 0;
                 yJumpSpeed = -1.9f;
@@ -229,10 +229,10 @@ public class Mario extends Sprite implements Serializable
                 ya = jumpTime * yJumpSpeed;
                 onGround = false;
                 sliding = false;
+                MarioComponent.insertFact(new Jump(this, jumpTime));                
             }
             else if (sliding && mayJump)
             {
-            	MarioComponent.insertFact(new Jump(this));
                 world.sound.play(Art.samples[Art.SAMPLE_MARIO_JUMP], this, 1, 1, 1);
                 xJumpSpeed = -facing * 6.0f;
                 yJumpSpeed = -2.0f;
@@ -242,6 +242,7 @@ public class Mario extends Sprite implements Serializable
                 onGround = false;
                 sliding = false;
                 facing = -facing;
+                MarioComponent.insertFact(new Jump(this, jumpTime));                
             }
             else if (jumpTime > 0)
             {
@@ -618,6 +619,7 @@ public class Mario extends Sprite implements Serializable
         deathTime = 1;
         Art.stopMusic();
         world.sound.play(Art.samples[Art.SAMPLE_MARIO_DEATH], this, 1, 1, 1);
+        MarioComponent.insertFact(new Death(this));
     }
 
 

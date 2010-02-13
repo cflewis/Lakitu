@@ -33,7 +33,7 @@ public class LakituFrameLauncher implements ActionListener
 
 	public LakituFrameLauncher() {
         Logger activeMqLogger = Logger.getLogger("org.apache.activemq");
-        activeMqLogger.setLevel(Level.WARN);
+        activeMqLogger.setLevel(Level.INFO);
 
         logger = Logger.getLogger("edu.ucsc.eis.mario");
 
@@ -118,11 +118,10 @@ public class LakituFrameLauncher implements ActionListener
 		if (source == badMenuItem) {
 			BulletBill.frequency = 50;
 			LevelGenerator.jumpLength = 16;
-			Mario.maxJumpTime = 50;
+			Mario.maxJumpTime = 30;
 			Mario.dieOnFall = false;
 			Mario.stopMovementOnDeath = false;
 			Mario.coinValue = 2;
-			if (mario != null) {mario.sheet = Art.fireMario;}
 
 			logger.info("Bad code enabled");
 		}

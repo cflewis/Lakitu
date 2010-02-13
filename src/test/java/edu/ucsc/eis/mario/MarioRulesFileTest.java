@@ -5,14 +5,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import edu.ucsc.eis.mario.events.*;
 import org.drools.runtime.rule.FactHandle;
 import org.junit.*;
 import static org.mockito.Mockito.*;
 
-import edu.ucsc.eis.mario.events.BulletBillSpawn;
-import edu.ucsc.eis.mario.events.Jump;
-import edu.ucsc.eis.mario.events.Landing;
-import edu.ucsc.eis.mario.events.ValueChange;
 import edu.ucsc.eis.mario.level.Pit;
 import edu.ucsc.eis.mario.sprites.BulletBill;
 import edu.ucsc.eis.mario.sprites.Mario;
@@ -26,6 +23,8 @@ import edu.ucsc.eis.mario.sprites.Mario;
  *
  */
 public class MarioRulesFileTest extends MarioRulesTest {
+    private static final int CORRECT_JUMP_TIME = 7;
+
 	@Ignore
 	public void testSceneDetection() {
 		ksession.insert(scene);
@@ -77,19 +76,17 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	 * 
 	 * Does this count if I'm not doing a position check?
 	 */
-	@Ignore
-	public void testBrokenJump() {
-		mario.setJumpTime(50);
-		assertTrue("Mario jump time was " + mario.getJumpTime(),
-				mario.getJumpTime() == 50);
-		tickScene(1);
-		// Rule engine should now kick in and stop the silly value
-		assertFired("marioTooHigh");
-		tickScene(1);
-		assertTrue(mario.getJumpTime() <= 0);
-		// Y is counted top to bottom, so higher Y is lower on screen
-		assertTrue(mario.getYJumpSpeed() >= 0);
-	}
+    @Test
+    public void testBrokenEventJumpHeight() {
+        FactHandle jumpEvent = ksession.insert(new Jump(mario, 50));
+        tickScene(1);
+        assertFired("jumpEventFound");
+        assertFired("marioJumpTooHigh");
+
+        // When Mario lands, we can retract this fact to show that he landed
+        ksession.retract(jumpEvent);
+    }
+
 	
 	/**
 	 * Test for position invalid
@@ -130,7 +127,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	
 	@Test
 	public void testEventJump() {
-		FactHandle jumpEvent = ksession.insert(new Jump(mario));
+		FactHandle jumpEvent = ksession.insert(new Jump(mario, CORRECT_JUMP_TIME));
 		tickScene(1);
 		assertFired("jumpEventFound");
 		
@@ -146,7 +143,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	// Test for invalid position over time: Mario can't jump too long
 	@Test
 	public void testBrokenEventJump() {
-		FactHandle jumpEvent = ksession.insert(new Jump(mario));
+		FactHandle jumpEvent = ksession.insert(new Jump(mario, CORRECT_JUMP_TIME));
 		// Cause Mario to be able to jump for *ages*
 		for (int i = 0; i < 100; i++) {
 			mario.setJumpTime(7);
@@ -191,27 +188,27 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		assertTrue(mario.sheet == Art.fireMario);
 	}
 	
-	// Test for invalid event occurance over time
+	// Test for invalid event occurrence over time
 	// This one uses events (jumping without landing)...
 	@Test
 	public void testValidDoubleJump() {
 		// Mario can't double jump ie. jump without landing
-		ksession.insert(new Jump(mario));
+		ksession.insert(new Jump(mario, CORRECT_JUMP_TIME));
 		tickScene(5);
 		mario.setJumpTime(5);
 		mario.setSliding(true);
-		ksession.insert(new Jump(mario));
+		ksession.insert(new Jump(mario, CORRECT_JUMP_TIME));
 		assertNotFired("marioDoubleJump");
 	}
 	
 	@Test
 	public void testBrokenDoubleJump() {
 		// Mario can't double jump ie. jump without landing
-		ksession.insert(new Jump(mario));
+		ksession.insert(new Jump(mario, CORRECT_JUMP_TIME));
 		tickScene(5);
 		mario.setJumpTime(5);
 		mario.setSliding(false);
-		ksession.insert(new Jump(mario));
+		ksession.insert(new Jump(mario, CORRECT_JUMP_TIME));
 		assertFired("marioDoubleJump");
 	}
 	
@@ -257,14 +254,18 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	 * isn't being set to the new Mario that is created once this one
 	 * dies.
 	 */
-	@Ignore
+	@Test
 	public void testDeathInteraction() {
 		float oldX = mario.getX();
 		mario.die();
+        ksession.insert(new Death(mario));
 		tickScene(1);
 		mario.keys[Mario.KEY_RIGHT] = true;
 		tickScene(1);
 		assertTrue(oldX == mario.x);
 		assertFired("stopMarioInteractionWhenDead");
+        ksession.insert(new NewLife(mario));
+        tickScene(1);
+        assertFired("retractDeath");
 	}
 }
