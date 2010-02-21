@@ -24,32 +24,6 @@ import edu.ucsc.eis.mario.sprites.Mario;
  */
 public class MarioRulesFileTest extends MarioRulesTest {
     private static final int CORRECT_JUMP_TIME = 7;
-
-	@Ignore
-	public void testSceneDetection() {
-		ksession.insert(scene);
-		assertFired("levelSceneFound");
-		assertFired("levelFound");
-		assertFired("pitFound");
-	}
-	
-	@Ignore
-	public void testDuck() {
-		Mario.large = false;
-		assertFalse(Mario.large);
-		tickScene(1);
-		
-		mario.keys[Mario.KEY_DOWN] = true;
-		tickScene(1);
-		
-		assertFalse(mario.isDucking());
-		
-		Mario.large = true;
-		assertTrue(Mario.large);
-		tickScene(1);
-		assertTrue(mario.isDucking());
-		assertFired("marioIsDucking");
-	}
 	
 	// Simple Test for Required Action Not Possible
 	@Test
@@ -102,25 +76,20 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	
 	@Test
 	public void testEscapeYBoundaryWithDeath() {
-		ksession.insert(scene);
-		mario.die();
-		mario.y = (scene.level.height * 16) + 21;
-		tickScene(1);
-		assertFalse(mario.deathTime == 0);
-		// This shouldn't fire if Mario is set to be dead
+        mario.y = -71f;
+        assertTrue(mario.getY() == -71f);
+        ksession.insert(new LevelGenerated(mario, scene.level));
+		ksession.insert(new MarioPosition(mario));
+        ksession.insert(new Death(mario));
 		assertNotFired("marioOutOfBounds");
 	}
 	
-	@Ignore
+	@Test
 	public void testEscapeXBoundary() {
-		ksession.insert(scene);
-		mario.x = -21;
-		assertTrue(mario.getX() == -21);
-		assertTrue(mario.deathTime == 0);
-		assertFired("marioOutOfBounds");
-		mario.deathTime = 0;
-		mario.x = (scene.level.height * 16) + 1;
-		assertTrue(mario.getX() == (scene.level.height * 16) + 1);
+        mario.x = -21f;
+        assertTrue(mario.getX() == -21f);
+        ksession.insert(new LevelGenerated(mario, scene.level));
+		ksession.insert(new MarioPosition(mario));
 		assertTrue(mario.deathTime == 0);
 		assertFired("marioOutOfBounds");
 	}
