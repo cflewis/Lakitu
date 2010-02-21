@@ -8,18 +8,18 @@ package edu.ucsc.eis.mario.repairs;
  * To change this template use File | Settings | File Templates.
  */
 public class RemoveSprite extends RepairEvent {
-    public static final int MARIO = 0;
-    public static final int BULLET_BILL = 1;
+    private int spriteId;
 
-    private int sprite;
-
-    public RemoveSprite(int sprite) {
-        this.sprite = sprite;
+    public RemoveSprite(int spriteId) {
+        this.spriteId = spriteId;
     }
 
     public void execute() {
-        switch (sprite) {
-            case MARIO: this.mario.die(); break;
+        if (this.spriteId == this.mario.getId()) {
+            this.mario.die();
+        }
+        else {
+            this.mario.getWorld().removeSprite(this.spriteId);   
         }
     }
 }

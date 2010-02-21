@@ -466,6 +466,15 @@ public class LevelScene extends Scene implements SpriteContext
         sprite.tick();
     }
 
+    public void removeSprite(int spriteId) {
+        for (Sprite s : sprites) {
+            if (s.getId() == spriteId) {
+                removeSprite(s);
+                break;
+            }
+        }
+    }
+
     public void removeSprite(Sprite sprite)
     {
         spritesToRemove.add(sprite);

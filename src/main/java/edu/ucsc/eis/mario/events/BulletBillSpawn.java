@@ -6,24 +6,31 @@ import edu.ucsc.eis.mario.LevelScene;
 import edu.ucsc.eis.mario.MarioComponent;
 import edu.ucsc.eis.mario.sprites.BulletBill;
 
-public class BulletBillSpawn implements Comparable<BulletBillSpawn> {
+public class BulletBillSpawn extends MarioEvent implements Comparable<BulletBillSpawn> {
  	private int cannonId;
  	private long spawnTime;
- 	private BulletBill bill;
+ 	private transient BulletBill bill;
+    private int billId;
 	
  	public BulletBillSpawn(BulletBill bill, int cannonId) {
  		this(bill, cannonId, MarioComponent.getClockTime());
  	}
  	
 	public BulletBillSpawn(BulletBill bill, int cannonId, long spawnTime) {
+        super(null);
 		this.cannonId = cannonId;
 		this.bill = bill;
 		this.spawnTime = spawnTime;
+        this.billId = bill.getId();
 	}
 	
 	public int getCannonId() {
 		return cannonId;
 	}
+
+    public int getBillId() {
+        return billId;
+    }
 	
 	public long getSpawnTime() {
 		return spawnTime;

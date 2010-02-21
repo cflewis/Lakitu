@@ -10,6 +10,8 @@ import edu.ucsc.eis.mario.level.SpriteTemplate;
 public class Sprite implements SoundSource
 {
     public static SpriteContext spriteContext;
+    private static int spriteIDs = 0;
+    private int id;
     
     public float xOld, yOld, x, y, xa, ya;
     
@@ -25,7 +27,12 @@ public class Sprite implements SoundSource
     public int layer = 1;
 
     public SpriteTemplate spriteTemplate;
-    
+
+    public Sprite() {
+        this.id = Sprite.spriteIDs;
+        Sprite.spriteIDs++;
+    }
+
     public void move()
     {
         x+=xa;
@@ -112,7 +119,11 @@ public class Sprite implements SoundSource
     {
         return false;
     }
-    
+
+    public int getId() {
+        return this.id;
+    }
+
     public Image[][] getSheet() {
 		return sheet;
 	}

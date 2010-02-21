@@ -196,8 +196,16 @@ rule "bulletBillSpawn"
         $list : ArrayList(size > 1) from collect(BulletBillSpawn(cannonId == $cannonId) over window:time(3s))
     then
         BulletBillSpawn newestBillSpawn = (BulletBillSpawn) Collections.max($list);
-        LevelScene levelScene = newestBillSpawn.getBulletBill().getWorld();
-        levelScene.removeSprite(newestBillSpawn.getBulletBill());
+
+        try {
+            producer.send(session.createObjectMessage(new RemoveSprite(newestBillSpawn.getBillId())));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Bullet bill exception " + e);
+            e.printStackTrace();
+        }
+
         retract(newestBillSpawn);
         logger.info("Bullet bills firing too fast, retracted " + newestBillSpawn);
 end
@@ -273,10 +281,10 @@ rule "marioOutOfBounds"
     when
         not Death()
         LevelGenerated($level : level)
-        $mario : MarioPosition((x < 0 || x > ($level.width * 16) || y < -60 || y > (($level.height * 16) + 20)))
+        $marioPosition : MarioPosition((x < 0 || x > ($level.width * 16) || y < -60 || y > (($level.height * 16) + 20)))
     then
         try {
-            producer.send(session.createObjectMessage(new RemoveSprite(RemoveSprite.MARIO)));
+            producer.send(session.createObjectMessage(new RemoveSprite($marioPosition.getId())));
         } catch (Exception e) {
             if (producer == null) { System.err.println("Producer was null"); }
             if (session == null) { System.err.println("Session was null"); }
@@ -284,6 +292,7 @@ rule "marioOutOfBounds"
             e.printStackTrace();
         }
 
+        logger.info("Mario ID is " + $marioPosition.getMario().getId());
         logger.info(String.format("Mario is out of bounds: (%f, %f) Level width/height: (%d, %d)",
-            $mario.getX(), $mario.getY(), $level.width, $level.height));
+            $marioPosition.getX(), $marioPosition.getY(), $level.width, $level.height));
 end

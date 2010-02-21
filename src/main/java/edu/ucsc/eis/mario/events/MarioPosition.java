@@ -13,11 +13,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class MarioPosition extends MarioEvent {
     float x;
     float y;
+    int spriteId;
 
     public MarioPosition(Mario mario) {
         super(mario);
         this.x = mario.getX();
         this.y = mario.getY();
+        this.spriteId = mario.getId();
     }
 
     public float getX() {
@@ -28,9 +30,14 @@ public class MarioPosition extends MarioEvent {
         return this.y;
     }
 
+    public int getId() {
+        return this.spriteId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this).
+            append("ID:", this.getId()).
 			append("X:", this.getX()).
 			append("Y:", this.getY()).
 			toString();

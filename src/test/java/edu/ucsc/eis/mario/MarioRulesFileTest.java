@@ -181,7 +181,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		assertFired("marioDoubleJump");
 	}
 	
-	// Test for invalid event occurance over time
+	// Test for invalid event occurrence over time
 	// ...this one is purely temporal
 	@Test
 	public void testBulletBillFiring() {
@@ -215,6 +215,14 @@ public class MarioRulesFileTest extends MarioRulesTest {
 				oldCoin, Mario.coins));
 		assertFired("coinValue");
 	}
+
+    @Test
+    public void testSpriteIdIncrement() {
+        BulletBill bill1 = new BulletBill(scene, 0, 0, 0);
+        BulletBill bill2 = new BulletBill(scene, 50, 50, 0);
+        System.err.println("Bill 1 is " + bill1.getId() + " Bill 2 is " + bill2.getId());
+        assertTrue(bill1.getId() < bill2.getId());
+    }
 	
 	/**
 	 * Test for "Action when not allowed" bug.
