@@ -9,8 +9,8 @@ import edu.ucsc.eis.mario.sprites.Mario;
  * Time: 12:01:41 AM
  * To change this template use File | Settings | File Templates.
  */
-public class NewLife {
+public class NewLife extends MarioEvent {
     public NewLife() {
-        super();
+        super(null);
     }
 }

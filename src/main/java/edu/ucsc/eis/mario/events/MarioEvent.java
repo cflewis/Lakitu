@@ -11,11 +11,7 @@ public class MarioEvent implements Serializable {
 	private Mario mario;
 	
 	public MarioEvent(Mario mario) {
-        try {
-            this.mario = (Mario)Preconditions.checkNotNull(mario).clone();
-        } catch (CloneNotSupportedException e) {
-            this.mario = mario;
-        }
+        this.mario = mario;
 	}
 	
 	public Mario getMario() {

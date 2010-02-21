@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 
-public class Level
+public class Level implements Serializable 
 {
     public static final String[] BIT_DESCRIPTIONS = {//
     "BLOCK UPPER", //
@@ -35,7 +35,7 @@ public class Level
     public byte[][] map;
     public byte[][] data;
 
-    public SpriteTemplate[][] spriteTemplates;
+    public transient SpriteTemplate[][] spriteTemplates;
 
     public int xExit;
     public int yExit;

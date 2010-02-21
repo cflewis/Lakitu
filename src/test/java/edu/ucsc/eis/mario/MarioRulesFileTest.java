@@ -64,7 +64,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		scene.level.pits = new ArrayList<Pit>();
 		scene.level.pits.add(new Pit(20, 29, false));
 		
-		ksession.insert(scene.level);
+		ksession.insert(new LevelGenerated(scene.mario, scene.level));
 		assertFired("pitTooLong");
 		//assertFalse(scene.level.getBlock(29, scene.level.height - 1) == (byte) 0);
 	}

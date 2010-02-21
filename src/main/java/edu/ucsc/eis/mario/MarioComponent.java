@@ -6,11 +6,13 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.*;
+import java.io.Serializable;
 import java.util.Random;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 
+import edu.ucsc.eis.mario.events.LevelGenerated;
 import edu.ucsc.eis.mario.events.MarioEvent;
 import edu.ucsc.eis.mario.events.NewLife;
 import edu.ucsc.eis.mario.repairs.RepairEvent;
@@ -228,9 +230,9 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
                         ObjectMessage objectMessage = (ObjectMessage) message;
                         Object payload = objectMessage.getObject();
 
-                        if (payload instanceof MarioEvent) {
+                        if (payload instanceof MarioEvent || payload instanceof Level) {
                             logger.info("Inserting event " + payload);
-                            ksession.insert((MarioEvent) payload);
+                            ksession.insert(payload);
                             if (rulesEnabled && gotMessage) {
                                 ksession.startProcess("Mario");
                                 ksession.fireAllRules();
@@ -243,7 +245,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
                             repairHandler.execute((RepairEvent) payload);
                         }
                         else {
-                            logger.warn("Can't find type of message");
+                            logger.warn("Can't find type of message " + objectMessage);
                         }
                     }
                 } catch (Exception e) {
@@ -348,7 +350,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         scene.setSound(sound);
         scene.init();
         if (parent != null) {parent.setMario(ls.mario);}
-        //sceneHandle = MarioComponent.insertFact(ls);
+        MarioComponent.insertFact(new LevelGenerated(ls.mario, ls.level));        
     }
 
     public void levelFailed()
@@ -421,15 +423,14 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     }
 
     public static void insertFact(Object fact) {
-    	if (ksession != null && fact != null && fact instanceof MarioEvent && rulesEnabled) {
-            MarioEvent marioFact = (MarioEvent)fact;
+    	if (ksession != null && fact != null && rulesEnabled) {
 
             if (session == null) {
-                logger.warn("Session is null, throwing away " + marioFact);
+                logger.warn("Session is null, throwing away " + fact);
             } else {
                 try {
-                    logger.info("Sending fact " + marioFact);
-                    producer.send(session.createObjectMessage(marioFact));
+                    logger.info("Sending fact " + fact);
+                    producer.send(session.createObjectMessage((Serializable) fact));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -2,7 +2,9 @@ package edu.ucsc.eis.mario.level;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class Pit {
+import java.io.Serializable;
+
+public class Pit implements Serializable {
 	private int startX;
 	private int endX;
 	public boolean hasStairs;

@@ -20,6 +20,7 @@ public class WriteBlocks extends RepairEvent {
 
     @Override
     public void execute() {
+        System.err.println("Writing blocks");
         Level level = this.mario.getWorld().level;
 
         for (int x = endX; x >= startX; x--) {

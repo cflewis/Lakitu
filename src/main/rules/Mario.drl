@@ -223,7 +223,7 @@ end
 rule "pitTooLong"
     ruleflow-group "Integrity"
     when
-        $level : Level()
+        LevelGenerated($level : level)
         $pit : Pit((length > 4 && hasStairs == true) ||
             (length > 6 && hasStairs == false))
             from $level.pits
