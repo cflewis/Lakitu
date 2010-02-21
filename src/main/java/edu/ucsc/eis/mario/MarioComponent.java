@@ -12,12 +12,9 @@ import java.util.Random;
 import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 
-import edu.ucsc.eis.mario.events.LevelGenerated;
-import edu.ucsc.eis.mario.events.MarioEvent;
-import edu.ucsc.eis.mario.events.NewLife;
+import edu.ucsc.eis.mario.events.*;
 import edu.ucsc.eis.mario.repairs.RepairEvent;
 import edu.ucsc.eis.mario.repairs.RepairHandler;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
@@ -54,9 +51,10 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private MapScene mapScene;
     int delay = 0;
     public static StatefulKnowledgeSession ksession;
-    FactHandle sceneHandle;
+    FactHandle levelHandle;
     public static boolean rulesEnabled = true;
     private LakituFrameLauncher parent;
+    private int ticks = 0;
 
     private Scale2x scale2x = new Scale2x(320, 240);
 
@@ -215,6 +213,12 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
                 Message message;
                 boolean gotMessage = false;
 
+                ticks++;
+
+                if (ticks % (24 * 2) == 0) {
+                    MarioComponent.insertFact(new MarioPosition(((LevelScene)scene).mario));
+                }
+
 //                ksession.update(triggerFact, "Trigger");
 //                ksession.startProcess("Mario");
 //                ksession.fireAllRules();
@@ -350,12 +354,12 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         scene.setSound(sound);
         scene.init();
         if (parent != null) {parent.setMario(ls.mario);}
-        MarioComponent.insertFact(new LevelGenerated(ls.mario, ls.level));        
+        MarioComponent.insertFact(new LevelGenerated(ls.mario, ls.level));
     }
 
     public void levelFailed()
     {
-    	if (sceneHandle != null) { ksession.retract(sceneHandle); }
+        MarioComponent.insertFact(new LevelOver());
         scene = mapScene;
         mapScene.startMusic();
         Mario.lives--;
@@ -382,6 +386,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 
     public void levelWon()
     {
+        MarioComponent.insertFact(new LevelOver());
         scene = mapScene;
         mapScene.startMusic();
         mapScene.levelWon();

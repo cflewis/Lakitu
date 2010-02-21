@@ -105,6 +105,15 @@ rule "retractDeath"
         }
 end
 
+rule "Retract Mario positions"
+    ruleflow-group "Bookkeeping"
+    salience -1
+    when
+        $position : MarioPosition()
+    then
+        retract($position);
+end
+
 rule "sendSentinel"
     ruleflow-group "Bookkeeping"
     when
@@ -250,4 +259,22 @@ rule "pitTooLong"
         logger.info("Found pit that is too long: " + $pit);
 end
 
- 
+rule "marioOutOfBounds"
+    ruleflow-group "Integrity"
+    when
+        not Death()
+        LevelGenerated($level : level)
+        $mario : MarioPosition((x < 0 || x > ($level.width * 16) || y < -60 || y > (($level.height * 16) + 20)))
+    then
+        try {
+            producer.send(session.createObjectMessage(new RemoveSprite(RemoveSprite.MARIO)));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Remove sprite exception " + e);
+            e.printStackTrace();
+        }
+
+        logger.info(String.format("Mario is out of bounds: (%f, %f) Level width/height: (%d, %d)",
+            $mario.getX(), $mario.getY(), $level.width, $level.height));
+end

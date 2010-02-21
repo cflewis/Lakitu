@@ -90,11 +90,12 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	/**
 	 * Test for position invalid
 	 */
-	@Ignore
+	@Test
 	public void testEscapeYBoundary() {
-		ksession.insert(scene);
-		mario.y = -71;
-		assertTrue(mario.getY() == -71);
+        mario.y = -71f;
+        assertTrue(mario.getY() == -71f);
+        ksession.insert(new LevelGenerated(mario, scene.level));
+		ksession.insert(new MarioPosition(mario));
 		assertTrue(mario.deathTime == 0);
 		assertFired("marioOutOfBounds");
 	}
