@@ -52,7 +52,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 	}
 	
 	// Simple Test for Required Action Not Possible
-	@Ignore
+	@Test
 	public void testPitDetection() {
 		// Create a pit by hand
 		for (int x = 20; x < 30; x++) {
@@ -64,10 +64,9 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		scene.level.pits = new ArrayList<Pit>();
 		scene.level.pits.add(new Pit(20, 29, false));
 		
-		ksession.insert(scene);
-		assertFired("pitFound");
+		ksession.insert(scene.level);
 		assertFired("pitTooLong");
-		assertFalse(scene.level.getBlock(29, scene.level.height - 1) == (byte) 0);
+		//assertFalse(scene.level.getBlock(29, scene.level.height - 1) == (byte) 0);
 	}
 	
 	/**
@@ -264,7 +263,7 @@ public class MarioRulesFileTest extends MarioRulesTest {
 		tickScene(1);
 		assertTrue(oldX == mario.x);
 		assertFired("stopMarioInteractionWhenDead");
-        ksession.insert(new NewLife(mario));
+        ksession.insert(new NewLife());
         tickScene(1);
         assertFired("retractDeath");
 	}

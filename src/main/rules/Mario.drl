@@ -5,7 +5,7 @@ package edu.ucsc.eis.mario
 import edu.ucsc.eis.mario.sprites.*
 import edu.ucsc.eis.mario.events.*
 import edu.ucsc.eis.mario.repairs.*
-import edu.ucsc.eis.mario.level.Pit
+import edu.ucsc.eis.mario.level.*
 import java.util.ArrayList
 import java.util.Iterator
 import java.util.Collections
@@ -218,6 +218,36 @@ rule "stopMarioInteractionWhenDead"
         }
 
         logger.info("Mario is dead, stopping movement");
+end
+
+rule "pitTooLong"
+    ruleflow-group "Integrity"
+    when
+        $level : Level()
+        $pit : Pit((length > 4 && hasStairs == true) ||
+            (length > 6 && hasStairs == false))
+            from $level.pits
+    then
+        int requiredLength = 6;
+        int requiredHeight = 1;
+
+        if ($pit.hasStairs == true) {
+            requiredLength = 4;
+            requiredHeight = 3;
+        }
+        
+        try {
+            //producer.send(session.createObjectMessage(new MarioMovement(null, 0f, 0f)));
+            //Fill in from the back
+            producer.send(session.createObjectMessage(new WriteBlocks($pit.getEndX(), $pit.getStartX() + requiredLength, requiredHeight)));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Pit exception " + e);
+            e.printStackTrace();
+        }
+
+        logger.info("Found pit that is too long: " + $pit);
 end
 
  
