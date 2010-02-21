@@ -25,6 +25,10 @@ public class LakituFrameLauncher implements ActionListener
 	JCheckBoxMenuItem showConsoleMenuItem;
 	JRadioButtonMenuItem goodMenuItem;
 	JRadioButtonMenuItem badMenuItem;
+    JCheckBoxMenuItem invincibleMenuItem;
+    JMenuItem restartMenuItem;
+    MarioComponent marioComponent;
+
 	Console console;
 
     Logger logger;
@@ -37,7 +41,7 @@ public class LakituFrameLauncher implements ActionListener
 
         logger = Logger.getLogger("edu.ucsc.eis.mario");
 
-        PatternLayout layout = new PatternLayout("%C{1} - %m\n");
+        PatternLayout layout = new PatternLayout("%m\n");
         ConsoleAppender appender = new ConsoleAppender(layout);
         logger.addAppender(appender);
         logger.setLevel(Level.INFO);
@@ -47,8 +51,14 @@ public class LakituFrameLauncher implements ActionListener
     	versionMenu.getPopupMenu().setLightWeightPopupEnabled(false);
     	JMenu rulesMenu = new JMenu("Rules");
     	rulesMenu.getPopupMenu().setLightWeightPopupEnabled(false);
+        JMenu cheatMenu = new JMenu("Cheat");
+        cheatMenu.getPopupMenu().setLightWeightPopupEnabled(false);
+        JMenu restartMenu = new JMenu("Restart");
+    	restartMenu.getPopupMenu().setLightWeightPopupEnabled(false);
     	menuBar.add(versionMenu);
     	menuBar.add(rulesMenu);
+        menuBar.add(cheatMenu);
+        menuBar.add(restartMenu);
     	
     	ButtonGroup group = new ButtonGroup();
     	goodMenuItem = new JRadioButtonMenuItem("Good Code");
@@ -78,7 +88,15 @@ public class LakituFrameLauncher implements ActionListener
     	showConsoleMenuItem.addActionListener(this);
     	//rulesMenu.add(showConsoleMenuItem);
 
-        MarioComponent marioComponent = new MarioComponent(640, 500, this);
+        restartMenuItem = new JMenuItem("Restart game");
+        restartMenuItem.addActionListener(this);
+        restartMenu.add(restartMenuItem);
+
+        invincibleMenuItem = new JCheckBoxMenuItem("Make Mario Invincible");
+        invincibleMenuItem.addActionListener(this);
+        cheatMenu.add(invincibleMenuItem);
+
+        marioComponent = new MarioComponent(640, 500, this);
         JFrame frame = new JFrame("Lakitu");
         frame.setContentPane(marioComponent);
         frame.pack();
@@ -116,24 +134,11 @@ public class LakituFrameLauncher implements ActionListener
 		}
 		
 		if (source == badMenuItem) {
-			BulletBill.frequency = 50;
-			LevelGenerator.jumpLength = 16;
-			Mario.maxJumpTime = 30;
-			Mario.dieOnFall = false;
-			Mario.stopMovementOnDeath = false;
-			Mario.coinValue = 2;
-
-			logger.info("Bad code enabled");
+	        enableBadCode();
 		}
 		
 		if (source == goodMenuItem) {
-			BulletBill.frequency = 100;
-			LevelGenerator.jumpLength = 2;
-			Mario.maxJumpTime = 7;
-			Mario.dieOnFall = true;
-			Mario.stopMovementOnDeath = true;
-			Mario.coinValue = 1;
-			logger.info("Good code enabled");
+            enableGoodCode();
 		}
 		
 		if (source == showConsoleMenuItem) {
@@ -143,6 +148,25 @@ public class LakituFrameLauncher implements ActionListener
 				console.setVisible(true);
 			}
 		}
+
+        if (source == invincibleMenuItem) {
+			if (mario.isInvincible()) {
+				mario.setInvincible(false);
+			} else {
+				mario.setInvincible(true);
+			}
+		}
+
+        if (source == restartMenuItem) {
+            marioComponent.toTitle();
+            marioComponent.initKnowledgeSession();
+            MarioComponent.rulesEnabled = true;
+            enableGoodCode();
+            mario.setInvincible(false);
+            goodMenuItem.setSelected(true);
+            rulesEnabledMenuItem.setSelected(true);
+            invincibleMenuItem.setSelected(false);
+        }
 	}
 	
 	public void setMario(Mario mario) {
@@ -152,5 +176,26 @@ public class LakituFrameLauncher implements ActionListener
     public static void main(String[] args)
     {
     	new LakituFrameLauncher();
+    }
+
+    private void enableGoodCode() {
+        BulletBill.frequency = 100;
+        LevelGenerator.jumpLength = 2;
+        Mario.maxJumpTime = 7;
+        Mario.dieOnFall = true;
+        Mario.stopMovementOnDeath = true;
+        Mario.coinValue = 1;
+        logger.info("Good code enabled");
+    }
+
+    private void enableBadCode() {
+        BulletBill.frequency = 50;
+        LevelGenerator.jumpLength = 16;
+        Mario.maxJumpTime = 30;
+        Mario.dieOnFall = false;
+        Mario.stopMovementOnDeath = false;
+        Mario.coinValue = 2;
+
+        logger.info("Bad code enabled");
     }
 }

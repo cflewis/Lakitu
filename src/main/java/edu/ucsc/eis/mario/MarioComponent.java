@@ -312,7 +312,9 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         Art.stopMusic();
     }
 
-    private void initKnowledgeSession() {
+    public void initKnowledgeSession() {
+        if (ksession != null) { ksession.dispose(); }
+        
 		try {
 			// load up the knowledge base
 			KnowledgeBase kbase = KnowledgeFactory.newKnowledgeBase("Mario.drl", "Mario.rf");
@@ -326,6 +328,10 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 			e.printStackTrace();
 			//System.exit(2);
 		}
+
+        ksession.setGlobal("producer", producer);
+        ksession.setGlobal("session", session);
+        ksession.setGlobal("logger", logger);
 	}
 
 	private void drawString(Graphics g, String text, int x, int y, int c)

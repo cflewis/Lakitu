@@ -159,7 +159,7 @@ rule "marioJumpTooHigh"
         logger.info("Mario jumped too high");
 
         try {
-            producer.send(session.createObjectMessage(new MarioMovement(false, 10f, $jump.getMario().xa * 3.0f)));
+            producer.send(session.createObjectMessage(new MarioMovement(false, 10f, $jump.getXAcceleration() * 1.5f)));
         } catch (Exception e) {
             if (producer == null) { System.err.println("Producer was null"); }
             if (session == null) { System.err.println("Session was null"); }

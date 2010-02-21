@@ -27,6 +27,8 @@ public class Mario extends Sprite implements Serializable
     public static boolean dieOnFall = true;
     public static boolean stopMovementOnDeath = true;
     public static int coinValue = 1;
+    private static boolean isInvincible = false;
+
 
     public static void resetStatic()
     {
@@ -577,6 +579,7 @@ public class Mario extends Sprite implements Serializable
 
     public void getHurt()
     {
+        if (isInvincible) return;
         if (deathTime > 0 || world.paused) return;
         if (invulnerableTime > 0) return;
 
@@ -802,5 +805,13 @@ public class Mario extends Sprite implements Serializable
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    public boolean isInvincible() {
+        return this.isInvincible;
+    }
+
+    public void setInvincible(boolean isInvincible) {
+        this.isInvincible = isInvincible;
     }
 }
