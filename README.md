@@ -15,8 +15,8 @@ A full description of Lakitu can be found at its [web page](http://www.zenetproj
 
 Running Lakitu
 --------------
-As Lakitu requires an embedded message broker to run, I haven't worked out how to package it up as an executable JAR file. Instead, users must use [Maven](http://maven.apache.org) to build and run Lakitu from [source](http://github.com/Lewisham/Lakitu/), then run 
+As Lakitu requires an embedded message broker to run, I haven't worked out how to package it up as an executable JAR file. Instead, users must use [Maven](http://maven.apache.org) to build and run Lakitu from [source](http://github.com/Lewisham/Lakitu/). Running: 
 
-    mvn activemq:run exec:java
+    mvn compile activemq:run exec:java
 
-inside the downloaded Lakitu directory. This starts the message broker first, runs Lakitu, then kills the message broker once Lakitu terminates.
+inside the downloaded Lakitu directory should do the trick. This starts the message broker first, runs Lakitu, then kills the message broker once Lakitu terminates.
