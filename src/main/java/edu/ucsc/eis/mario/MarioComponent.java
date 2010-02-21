@@ -215,7 +215,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 
                 ticks++;
 
-                if (ticks % (24 * 2) == 0) {
+                if (ticks % 24 == 0) {
                     MarioComponent.insertFact(new MarioPosition(((LevelScene)scene).mario));
                 }
 
