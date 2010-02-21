@@ -207,7 +207,16 @@ rule "coinValue"
     when
         $change : ValueChange(changeType == ValueChange.COIN_CHANGE, eval((startValue + 1) != endValue))
     then
-        Mario.coins = $change.getStartValue() + 1;
+        try {
+            producer.send(session.createObjectMessage(new ValueRepair(ValueChange.COIN_CHANGE, $change.getStartValue() + 1)));
+        } catch (Exception e) {
+            if (producer == null) { System.err.println("Producer was null"); }
+            if (session == null) { System.err.println("Session was null"); }
+            logger.error("Coin value exception " + e);
+            e.printStackTrace();
+        }
+
+        logger.info("Changing coin value");
         retract($change);
 end
 

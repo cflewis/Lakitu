@@ -5,7 +5,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import edu.ucsc.eis.mario.sprites.Mario;
 
 public class ValueChange extends MarioEvent {
-	public static int COIN_CHANGE = 1;
+	public static final int COIN_CHANGE = 1;
 	private int changeType;
 	private int startValue;
 	private int endValue;
