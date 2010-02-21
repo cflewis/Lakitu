@@ -1,6 +1,6 @@
 Lakitu 
 ======
-<img src="http://www.zenetproject.com/pages/_media/lakitu.png" />
+<img src="http://www.zenetproject.com/pages/_media/lakitu.png" height="200" />
 
 [Lakitu](http://www.zenetproject.com/pages/lakitu) is a research project from UC Santa Cruz's [Expressive Intelligence Studio](http://eis-blog.ucsc.edu). It uses the [Zenet framework](http://www.zenetproject.com) to monitor events from a Super Mario World-style game, and issues repairs when the game fails. It is the smallest complete implementation of the Zenet architecture.
 
