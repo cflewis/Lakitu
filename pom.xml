@@ -37,18 +37,6 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.cflewis.simple-grester</groupId>
-                <artifactId>simple-grester</artifactId>
-                <version>1.0</version>
-                <configuration>
-                    <codeSources>
-                        src/main/java/edu/ucsc/eis/mario/sprites/Mario.java
-                    </codeSources>
-                    <testSuiteClass>edu.ucsc.eis.mario.sprites.MarioTest
-                    </testSuiteClass>
-                </configuration>
-            </plugin>
 			 <plugin>
 			  <groupId>org.apache.maven.plugins</groupId>
 			  <artifactId>maven-assembly-plugin</artifactId>
